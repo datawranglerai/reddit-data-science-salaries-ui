@@ -20,6 +20,9 @@ export default function MethodologyBlock() {
           Strong claims are deliberately suppressed when filtered sample sizes get too small.
         </List.Item>
         <List.Item>
+          The 2025 thread is included, but it is the smallest yearly slice; its jump is framed as a latest signal rather than a settled market reset.
+        </List.Item>
+        <List.Item>
           Reddit excerpts are treated as source texture. If they are weak, sparse, or too anecdotal, the UI falls back to metadata instead.
         </List.Item>
       </List.Root>

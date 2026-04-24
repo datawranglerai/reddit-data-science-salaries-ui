@@ -26,10 +26,10 @@ export default function IndustryHeatmap({ records }: Props) {
         Industry ceilings
       </Text>
       <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.35rem" }} lineHeight="1" mb="3">
-        Industry doesn’t just move the median. It changes who gets range.
+        Industry still changes who gets range.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5" maxW="60ch">
-        A market with one clean salary ladder would not produce this pattern. Some industries pay up early. Others only open up when seniority crosses a threshold.
+        A market with one clean salary ladder would not produce this pattern. Some industries pay up early; others only open up once seniority crosses a threshold.
       </Text>
 
       <Box overflowX="auto">

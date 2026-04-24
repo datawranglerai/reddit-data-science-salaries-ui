@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { Box, Grid, Text } from "@chakra-ui/react";
 
-import processedData from "./data/processed_salary_data_v2.json";
-import originalData from "./data/original_salary_data.json";
+import processedData from "./data/v2/processed_salary_data_v3.json";
 import { applyFilters, fmtK, processRecords } from "./utils/dataUtils";
 import {
   buildSourceContext,
@@ -40,11 +39,21 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 const ALL_RECORDS = processRecords(processedData as SalaryRecord[]);
-const ALL_SOURCE_CONTEXT = buildSourceContext(originalData as RawSourceRecord[]);
+const ALL_SOURCE_CONTEXT = buildSourceContext(processedData as RawSourceRecord[]);
 
 function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr)).filter(Boolean) as T[];
 }
+
+function getYearRangeLabel(records: typeof ALL_RECORDS): string {
+  const years = unique(records.map((record) => record.year).filter((year) => year > 0)).sort((left, right) => left - right);
+  if (!years.length) return "Unknown";
+  const first = years[0];
+  const last = years[years.length - 1];
+  return first === last ? String(first) : `${first}–${last}`;
+}
+
+const YEAR_RANGE_LABEL = getYearRangeLabel(ALL_RECORDS);
 
 export default function App() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -71,8 +80,14 @@ export default function App() {
 
   const heroFacts = [
     { label: "Rendered records", value: ALL_RECORDS.length.toLocaleString() },
-    { label: "Source comments", value: (originalData as RawSourceRecord[]).length.toLocaleString() },
-    { label: "Years", value: "2020–2024" },
+    { label: "Source comments", value: ALL_SOURCE_CONTEXT.length.toLocaleString() },
+    { label: "Years", value: YEAR_RANGE_LABEL },
+  ];
+
+  const heroContextItems = [
+    { label: "Thesis", value: "Full-dataset editorial framing. Filters below pressure-test the claim, but the 2025 spike stays marked as an early signal." },
+    { label: "Evidence", value: `${summary.totalCountries} countries, ${summary.totalRecords} rendered records, and source texture from the refreshed end-of-year Reddit threads.` },
+    { label: "Bias check", value: "Community-reported pay is useful, but the latest-year sample is thinner than the earlier threads, so confidence is deliberately bounded." },
   ];
 
   const growthLine =
@@ -85,14 +100,15 @@ export default function App() {
       <Box className="story-shell" display="flex" flexDirection="column" gap="16">
         <Box pt={{ base: 6, md: 10 }}>
           <HeroClaim
-            eyebrow="r/datascience salary threads · 2020–2024"
-            title="Data science pay didn’t just rise — it repriced."
-            description="The old version of this app behaved like a monitor. This one is built to make an argument: the salary floor moved, the ceiling widened, and the market never really went back to its pre-2022 shape. Filters still matter — but they test the claim rather than replacing it."
+            eyebrow={`r/datascience salary threads · ${YEAR_RANGE_LABEL}`}
+            title="The ladder is intact. The latest signal is loud."
+            description="The refreshed threads tell a sharper, less tidy story: pay climbed into 2023, base salary softened in 2024 while total comp kept edging up, and 2025 jumps hard on the smallest sample. The spike matters — it just does not get to pretend it is settled law."
             statLabel={filterMode ? "Current filtered slice" : "Current full-dataset read"}
             statValue={summary.medianBase ? fmtK(summary.medianBase) : "N/A"}
             statSubline={growthLine}
             facts={heroFacts}
             scopeNote={filterMode ? "Full-dataset thesis; filtered view below tests this slice. When the evidence gets thin, the UI drops back to caveats instead of pretending confidence." : undefined}
+            contextItems={heroContextItems}
           />
         </Box>
 
@@ -109,8 +125,8 @@ export default function App() {
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
             eyebrow="Chapter 01 / repricing"
-            title="The cleanest signal is the break in the curve."
-            description="If you only remember one thing from this page, make it this: the compensation regime changes hard in 2022. That is the closest thing the dataset has to a plot point."
+            title="The curve no longer has one clean break."
+            description="The old story was a simple repricing jump. The refreshed version is more interesting: gradual lift, a 2024 wobble, then a 2025 acceleration that deserves attention and a caveat in the same breath."
           />
           <SalaryByYear records={filteredRecords} hasActiveFilters={filterMode} />
           <KPICards facts={facts} />
@@ -121,8 +137,8 @@ export default function App() {
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
             eyebrow="Chapter 02 / upside"
-            title="The upside didn’t spread evenly across the stack."
-            description="Some of the premium is role-driven. Some of it is seniority-driven. And some of it is simply variance opening up once you move higher in the ladder."
+            title="The upside still belongs to the top of the ladder."
+            description="The broad salary ladder survives the data refresh. Analysts sit lower, data scientists anchor the middle, and leadership plus senior tracks pull the ceiling upward — especially when total comp enters the room."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1fr 1.15fr" }} gap="6">
             <RolePayComparison records={filteredRecords} />
@@ -135,8 +151,8 @@ export default function App() {
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
             eyebrow="Chapter 03 / market bends"
-            title="Geography, industry, and remote work keep bending the market out of shape."
-            description="USD normalization smooths the rough edges, but it does not erase them. The market still clears differently across countries, industries, and work arrangements."
+            title="Geography still bends the read. Remote work mostly adds noise."
+            description="The dataset is still US-heavy, so global comparisons need a raised eyebrow. Remote work is common, but the premium is unstable enough that it reads more like market texture than a universal rule."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1.15fr 0.85fr" }} gap="6">
             <SalaryByCountry records={filteredRecords} />
@@ -151,7 +167,7 @@ export default function App() {
           <SectionHeader
             eyebrow="Chapter 04 / thread voice"
             title="The threads help explain the mood — not the truth."
-            description="The source material matters because it shows how people talked about salary, not just how they filled in a template. These excerpts are there to give the data texture. If the slice gets weak, the quotes disappear before the caveats do."
+            description="The source material matters because it shows how people talked about salary, not just how they filled in a template. These excerpts add texture. If the slice gets weak, the quotes disappear before the caveats do."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1.25fr 0.75fr" }} gap="6" alignItems="start">
             <ThreadPullout quotes={quotes} hasActiveFilters={filterMode} />

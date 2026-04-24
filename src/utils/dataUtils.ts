@@ -22,14 +22,43 @@ export function extractYear(threadTitle: string): number {
   return match ? parseInt(match[1]) : 0;
 }
 
-export function getCareerStage(level: string): string {
+export function normalizeRemote(value: boolean | string | null | undefined): boolean {
+  if (typeof value === "boolean") return value;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return ["true", "yes", "remote", "hybrid"].includes(normalized) || normalized.includes("remote") || normalized.includes("hybrid");
+}
+
+export function parseExperienceYears(value: number | string | null | undefined): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  const raw = String(value ?? "").trim().toLowerCase();
+  if (!raw) return null;
+  const range = raw.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+  if (range) return (Number(range[1]) + Number(range[2])) / 2;
+  const match = raw.match(/(\d+(?:\.\d+)?)/);
+  if (!match) return null;
+  const years = Number(match[1]);
+  if (!Number.isFinite(years)) return null;
+  return /\bmonth|mo\b/.test(raw) ? years / 12 : years;
+}
+
+export function getCareerStage(level: string, title = "", priorExperience?: number | string | null): string {
   const l = level.toLowerCase().trim();
-  if (["entry", "junior"].includes(l)) return "Entry";
-  if (["mid"].includes(l)) return "Mid";
-  if (["senior"].includes(l)) return "Senior";
-  if (["lead", "staff", "principal"].includes(l)) return "Lead/Staff";
-  if (["manager", "director"].includes(l)) return "Manager/Director";
-  if (["vp"].includes(l)) return "Director+";
+  const t = title.toLowerCase();
+  if (/\b(vp|vice president|chief|cxo|head of)\b/.test(l) || /\b(vp|vice president|chief|cxo|head of)\b/.test(t)) return "Director+";
+  if (/\b(manager|director)\b/.test(l) || /\b(manager|director)\b/.test(t)) return "Manager/Director";
+  if (/\b(lead|staff|principal)\b/.test(l) || /\b(lead|staff|principal)\b/.test(t)) return "Lead/Staff";
+  if (/\b(senior|sr\.?|l5|e5|iii|3)\b/.test(l) || /\b(senior|sr\.?)\b/.test(t)) return "Senior";
+  if (/\b(entry|junior|jr\.?|associate|new grad|intern|l1|i|1)\b/.test(l) || /\b(junior|intern)\b/.test(t)) return "Entry";
+  if (/\b(mid|l3|l4|ii|2)\b/.test(l)) return "Mid";
+
+  const years = parseExperienceYears(priorExperience);
+  if (years !== null) {
+    if (years <= 1.5) return "Entry";
+    if (years < 5) return "Mid";
+    if (years < 9) return "Senior";
+    return "Lead/Staff";
+  }
+
   return "Mid";
 }
 
@@ -48,10 +77,11 @@ export function processRecords(raw: SalaryRecord[]): ProcessedRecord[] {
     const salary = typeof r.salary === "string" ? parseFloat(r.salary) : r.salary;
     const tc = typeof r.total_comp === "string" ? parseFloat(r.total_comp) : r.total_comp;
     const year = extractYear(r.thread_title || "");
+    const priorExperience = r.prior_experience || r.prior_experience_description;
     return {
       ...r,
       year,
-      careerStage: getCareerStage(r.level || ""),
+      careerStage: getCareerStage(r.level || "", r.title || "", priorExperience),
       roleType: getRoleType(r.title || ""),
       usdSalary: salary && !isNaN(salary) ? toUSD(salary, r.currency) : null,
       usdTotalComp: tc && !isNaN(tc) ? toUSD(tc, r.currency) : null,
@@ -100,7 +130,7 @@ export function applyFilters(
     if (filters.careerStages.length && !filters.careerStages.includes(r.careerStage)) return false;
     if (filters.roleTypes.length && !filters.roleTypes.includes(r.roleType)) return false;
     if (filters.industries.length && !filters.industries.includes(r.company_industry)) return false;
-    if (filters.remoteOnly && r.is_remote !== "True") return false;
+    if (filters.remoteOnly && !normalizeRemote(r.is_remote)) return false;
     if (filters.educations.length && !filters.educations.includes(r.education)) return false;
     return true;
   });

@@ -7,7 +7,7 @@ The app turns community-reported salary survey data from `r/datascience` into a 
 - filterable KPI cards
 - salary trend and comparison charts
 - an industry/career-stage heatmap
-- a scatter plot for salary vs. stage
+- a career-stage spread chart
 - a paginated/exportable data table
 
 ## Project structure
@@ -18,8 +18,9 @@ The app turns community-reported salary survey data from `r/datascience` into a 
 - `src/components/KPICards.tsx` – headline metrics
 - `src/components/DataTable.tsx` – sortable, paginated table + CSV export
 - `src/utils/dataUtils.ts` – salary normalization, career-stage mapping, role bucketing, filtering
-- `src/data/original_salary_data.json` – original/raw source data
-- `src/data/processed_salary_data_v2.json` – processed dataset currently rendered by the UI
+- `src/data/v2/processed_salary_data_v3.json` – processed 2020–2025 dataset currently rendered by the UI
+- `src/data/v2/processed_salary_data_v3.csv` – tabular source for the rendered v3 JSON
+- `src/data/original_salary_data.json` and `src/data/processed_salary_data_v2.json` – legacy source artifacts retained for comparison
 - `screenshots/` – visual reference screenshots for manual QA
 
 ## Running locally
@@ -96,6 +97,9 @@ The `screenshots/` folder contains current snapshots of the dashboard. Use them 
 
 ## Data notes
 
-- The runtime UI reads from `src/data/processed_salary_data_v2.json`
+- The runtime UI reads from `src/data/v2/processed_salary_data_v3.json`
+- The refreshed dataset spans the 2020–2025 r/datascience end-of-year salary sharing threads, including the 2025 thread.
 - `src/utils/dataUtils.ts` applies the shared normalization and filtering logic used across the dashboard
-- `src/data/original_salary_data.json` is the original/raw input dataset and should be treated as the source artifact for future data-refresh work
+- USD normalization uses the fixed FX table in `src/utils/dataUtils.ts`; unsupported currencies are retained as rows but excluded from USD salary medians.
+- The 2025 slice is the smallest year in the current dataset, so narrative copy treats the latest jump as directional rather than definitive.
+- Legacy data files remain in `src/data/` for comparison; future data-refresh work should update the v3 JSON/CSV pair or add the next version under `src/data/v2/`.

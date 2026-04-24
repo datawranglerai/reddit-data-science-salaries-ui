@@ -26,10 +26,10 @@ export default function RolePayComparison({ records }: Props) {
         Who captured the upside
       </Text>
       <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.4rem" }} lineHeight="1" mb="3">
-        Leadership and ML roles pull the ceiling upward.
+        Leadership pulls the ceiling upward.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
-        This is the cleaner replacement for the old donut. It tells you where the money sits and how much of the sample each role type actually owns.
+        The dataset is data-scientist heavy, but the ladder is still visible. Leadership sits farthest right; analysts sit lower; the middle of the market is where most of the sample lives.
       </Text>
 
       <VStack align="stretch" gap="4">

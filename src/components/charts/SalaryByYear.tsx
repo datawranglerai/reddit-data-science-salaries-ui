@@ -2,7 +2,7 @@ import { Box, HStack, Text, Wrap } from "@chakra-ui/react";
 import { CartesianGrid, LabelList, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ProcessedRecord } from "../../types";
 import { fmtK } from "../../utils/dataUtils";
-import { canShowStrongYearNarrative, getStorySummary, getYearNarrative } from "../../utils/storyData";
+import { canShowStrongYearNarrative, getStorySummary, getYearInflection, getYearNarrative } from "../../utils/storyData";
 
 interface Props {
   records: ProcessedRecord[];
@@ -28,8 +28,11 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
   const series = getYearNarrative(records);
   const summary = getStorySummary(records);
   const strongNarrative = canShowStrongYearNarrative(records, series);
+  const inflection = getYearInflection(series);
   const baseIndex = Math.max(...series.map((point, index) => (point.base ? index : -1)));
   const totalCompIndex = Math.max(...series.map((point, index) => (point.totalComp ? index : -1)));
+  const latest = [...series].reverse().find((point) => point.base !== null);
+  const latestIsThin = Boolean(latest && latest.baseCount < 60);
 
   return (
     <Box className="story-surface" borderRadius="12px" p={{ base: 5, md: 6 }}>
@@ -37,10 +40,10 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
         Repricing / yearly evidence
       </Text>
       <Text className="story-display" fontSize={{ base: "2rem", md: "2.8rem" }} lineHeight="0.98" mb="3">
-        Data science pay didn’t just drift upward — it bent.
+        Data science pay climbed, wobbled, then flashed hot.
       </Text>
       <Text color="var(--story-text-muted)" fontSize={{ base: "md", md: "lg" }} lineHeight="1.7" maxW="58ch">
-        The cleanest signal in the dataset is not a slow climb. It is a step-change. Base pay jumps hard into 2022 and never really returns to the old regime.
+        The refreshed dataset is no longer a single-break story. Base pay rises into 2023, dips in 2024, then jumps in 2025 — a strong latest signal with a smaller sample behind it.
       </Text>
 
       <HStack gap="4" mt="5" mb="5" flexWrap="wrap">
@@ -51,13 +54,13 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
         <Box>
           <Text className="story-eyebrow" mb="1">From {summary.earliestYear ?? "—"} to {summary.latestYear ?? "—"}</Text>
           <Text color="var(--story-text)" fontWeight="700" fontSize="xl">
-            {summary.growthPercent !== null ? `+${summary.growthPercent}%` : "Insufficient range"}
+            {summary.growthPercent !== null ? `${summary.growthPercent >= 0 ? "+" : ""}${summary.growthPercent}%` : "Insufficient range"}
           </Text>
         </Box>
         <Box>
           <Text className="story-eyebrow" mb="1">Story status</Text>
           <Text color={strongNarrative ? "var(--story-success)" : "var(--story-warning)"} fontWeight="700" fontSize="xl">
-            {strongNarrative ? "Claim holds" : "Thin slice"}
+            {strongNarrative ? (latestIsThin ? "Latest signal" : "Claim holds") : "Thin slice"}
           </Text>
         </Box>
       </HStack>
@@ -67,12 +70,12 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
           <CartesianGrid strokeDasharray="3 6" stroke="rgba(67,61,75,0.5)" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: "#a9a1ad", fontSize: 11 }} axisLine={false} tickLine={false} />
           <YAxis tickFormatter={(value) => fmtK(Number(value))} tick={{ fill: "#a9a1ad", fontSize: 11 }} axisLine={false} tickLine={false} width={62} />
-          {strongNarrative && (
+          {strongNarrative && inflection && (
             <ReferenceLine
-              x="2022"
+              x={String(inflection.year)}
               stroke="var(--story-tertiary)"
               strokeDasharray="3 3"
-              label={{ value: hasActiveFilters ? "2022 still breaks upward" : "2022 repricing jump", fill: "#ffd8bf", fontSize: 11 }}
+              label={{ value: hasActiveFilters ? `${inflection.year} lift in this slice` : `${inflection.year} latest-year jump`, fill: "#ffd8bf", fontSize: 11 }}
             />
           )}
           <Tooltip
@@ -102,7 +105,9 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
 
       <Text mt="4" color="var(--story-text-muted)" fontSize="sm" lineHeight="1.7">
         {strongNarrative
-          ? "The claim is allowed because the filtered slice still clears the minimum record thresholds for the years doing the explanatory work."
+          ? latestIsThin
+            ? "The latest-year jump clears the chart threshold, but its sample is thinner than the earlier years. Treat it as a directional signal, not a settled market reset."
+            : "The claim is allowed because the filtered slice still clears the minimum record thresholds for the years doing the explanatory work."
           : "This slice no longer clears the narrative threshold. Keep reading the data, but treat the storyline as full-dataset framing rather than a strong claim about this exact subset."}
       </Text>
     </Box>

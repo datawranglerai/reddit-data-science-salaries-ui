@@ -12,7 +12,7 @@ import type {
   StorySummary,
   YearNarrativePoint,
 } from "../types";
-import { extractYear, fmtK, getCareerStage, getRoleType, median, percentile, toUSD } from "./dataUtils";
+import { extractYear, fmtK, getCareerStage, getRoleType, median, normalizeRemote, percentile, toUSD } from "./dataUtils";
 
 export const STORY_THRESHOLDS = {
   heroMinRecords: 10,
@@ -23,15 +23,11 @@ export const STORY_THRESHOLDS = {
   industryCellMinRecords: 3,
 } as const;
 
-export const YEAR_ORDER = [2020, 2021, 2022, 2023, 2024];
+export const DEFAULT_YEAR_ORDER = [2020, 2021, 2022, 2023, 2024, 2025];
 export const STAGE_ORDER = ["Entry", "Mid", "Senior", "Lead/Staff", "Manager/Director", "Director+"];
 
 function validNumbers(values: Array<number | null | undefined>): number[] {
   return values.filter((value): value is number => typeof value === "number" && Number.isFinite(value) && value > 0);
-}
-
-function normalizeRemote(value: boolean | string | null | undefined): boolean {
-  return value === true || value === "True" || value === "true" || value === "Yes";
 }
 
 function cleanExcerpt(text: string): string {
@@ -40,6 +36,11 @@ function cleanExcerpt(text: string): string {
     .replace(/[*_`>#-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function getYearOrder(records: ProcessedRecord[]): number[] {
+  const years = [...new Set(records.map((record) => record.year).filter((year) => year > 0))].sort((left, right) => left - right);
+  return years.length ? years : DEFAULT_YEAR_ORDER;
 }
 
 export function hasActiveFilters(filters: FilterState): boolean {
@@ -79,7 +80,7 @@ export function getStorySummary(records: ProcessedRecord[]): StorySummary {
   return {
     totalRecords: records.length,
     totalCountries: new Set(records.map((record) => record.country).filter(Boolean)).size,
-    remotePercent: records.length ? Math.round((records.filter((record) => record.is_remote === "True").length / records.length) * 100) : 0,
+    remotePercent: records.length ? Math.round((records.filter((record) => normalizeRemote(record.is_remote)).length / records.length) * 100) : 0,
     medianBase: salaries.length ? Math.round(median(salaries)) : null,
     medianTotalComp: totalComp.length ? Math.round(median(totalComp)) : null,
     earliestYear: earliest?.year ?? null,
@@ -91,7 +92,7 @@ export function getStorySummary(records: ProcessedRecord[]): StorySummary {
 }
 
 export function getYearNarrative(records: ProcessedRecord[]): YearNarrativePoint[] {
-  return YEAR_ORDER.map((year) => {
+  return getYearOrder(records).map((year) => {
     const scoped = records.filter((record) => record.year === year);
     const baseValues = validNumbers(scoped.map((record) => record.usdSalary));
     const totalCompValues = validNumbers(scoped.map((record) => record.usdTotalComp));
@@ -108,9 +109,23 @@ export function getYearNarrative(records: ProcessedRecord[]): YearNarrativePoint
 
 export function canShowStrongYearNarrative(records: ProcessedRecord[], series = getYearNarrative(records)): boolean {
   if (records.length < STORY_THRESHOLDS.heroMinRecords) return false;
-  const year2021 = series.find((point) => point.year === 2021);
-  const year2022 = series.find((point) => point.year === 2022);
-  return Boolean(year2021 && year2022 && year2021.baseCount >= STORY_THRESHOLDS.perYearMinRecords && year2022.baseCount >= STORY_THRESHOLDS.perYearMinRecords);
+  const supportedYears = series.filter((point) => point.base !== null && point.baseCount >= STORY_THRESHOLDS.perYearMinRecords);
+  return supportedYears.length >= 2;
+}
+
+export function getYearInflection(series: YearNarrativePoint[]): YearNarrativePoint | null {
+  let strongest: { point: YearNarrativePoint; lift: number } | null = null;
+  for (let index = 1; index < series.length; index += 1) {
+    const previous = series[index - 1];
+    const current = series[index];
+    if (!previous.base || !current.base || previous.baseCount < STORY_THRESHOLDS.perYearMinRecords || current.baseCount < STORY_THRESHOLDS.perYearMinRecords) {
+      continue;
+    }
+    const lift = current.base - previous.base;
+    if (lift <= 0) continue;
+    if (!strongest || lift > strongest.lift) strongest = { point: current, lift };
+  }
+  return strongest?.point ?? null;
 }
 
 export function getRoleNarrative(records: ProcessedRecord[]): RoleNarrativePoint[] {
@@ -164,10 +179,10 @@ export function getCountryNarrative(records: ProcessedRecord[]): CountryNarrativ
 }
 
 export function getRemoteNarrative(records: ProcessedRecord[]): RemoteNarrativePoint[] {
-  return YEAR_ORDER.map((year) => {
+  return getYearOrder(records).map((year) => {
     const scoped = records.filter((record) => record.year === year);
-    const remoteValues = validNumbers(scoped.filter((record) => record.is_remote === "True").map((record) => record.usdSalary));
-    const onsiteValues = validNumbers(scoped.filter((record) => record.is_remote !== "True").map((record) => record.usdSalary));
+    const remoteValues = validNumbers(scoped.filter((record) => normalizeRemote(record.is_remote)).map((record) => record.usdSalary));
+    const onsiteValues = validNumbers(scoped.filter((record) => !normalizeRemote(record.is_remote)).map((record) => record.usdSalary));
     return {
       year,
       label: String(year),
@@ -243,7 +258,7 @@ export function buildSourceContext(raw: RawSourceRecord[]): SourceContextRecord[
       return {
         year,
         title,
-        careerStage: getCareerStage(record.level ?? ""),
+        careerStage: getCareerStage(record.level ?? "", title, record.prior_experience ?? record.prior_experience_description),
         roleType: getRoleType(title),
         country,
         companyIndustry,
@@ -251,7 +266,7 @@ export function buildSourceContext(raw: RawSourceRecord[]): SourceContextRecord[
         isRemote: normalizeRemote(record.is_remote),
         location,
         body: cleanExcerpt(record.original_body ?? ""),
-        upvotes: record.upvotes ?? 0,
+        upvotes: typeof record.upvotes === "string" ? parseInt(record.upvotes, 10) || 0 : record.upvotes ?? 0,
         commentUrl: record.comment_url ?? "",
         createdAt: record.created_at ?? "",
         usdSalary,

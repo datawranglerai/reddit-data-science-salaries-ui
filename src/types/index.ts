@@ -2,8 +2,9 @@ export interface SalaryRecord {
   id: number;
   title: string;
   level: string;
-  salary: number | string;
-  total_comp: number | string;
+  tenure_length?: string;
+  salary: number | string | null;
+  total_comp: number | string | null;
   currency: string;
   country: string;
   city: string;
@@ -12,9 +13,16 @@ export interface SalaryRecord {
   is_remote: string;
   thread_title: string;
   prior_experience: number | string;
+  prior_experience_description?: string;
   had_internship: string;
+  had_coop?: string;
   is_salary_post: string;
   location_string: string;
+  original_body?: string;
+  upvotes?: number | string;
+  comment_url?: string;
+  created_at?: string;
+  thread_url?: string;
 }
 
 export interface ProcessedRecord extends SalaryRecord {
@@ -49,9 +57,11 @@ export interface RawSourceRecord {
   thread_title?: string | null;
   location_string?: string | null;
   original_body?: string | null;
-  upvotes?: number | null;
+  upvotes?: number | string | null;
   comment_url?: string | null;
   created_at?: string | null;
+  prior_experience?: number | string | null;
+  prior_experience_description?: string | null;
 }
 
 export interface SourceContextRecord {
