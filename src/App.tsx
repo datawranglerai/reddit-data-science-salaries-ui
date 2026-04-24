@@ -85,9 +85,9 @@ export default function App() {
   ];
 
   const heroContextItems = [
-    { label: "Thesis", value: "Full-dataset editorial framing. Filters below pressure-test the claim, but the 2025 spike stays marked as an early signal." },
-    { label: "Evidence", value: `${summary.totalCountries} countries, ${summary.totalRecords} rendered records, and source texture from the refreshed end-of-year Reddit threads.` },
-    { label: "Bias check", value: "Community-reported pay is useful, but the latest-year sample is thinner than the earlier threads, so confidence is deliberately bounded." },
+    { label: "Thesis", value: "This is the full-dataset read. The filters below are there to stress-test it, not quietly rewrite it." },
+    { label: "Evidence", value: `${summary.totalCountries} countries, ${summary.totalRecords} rendered records, and thread-level source material from the end-of-year posts.` },
+    { label: "Bias check", value: "Self-reported pay is useful right up until people start treating it like payroll data. And the tail end of the series is thinner than the middle." },
   ];
 
   const growthLine =
@@ -101,13 +101,13 @@ export default function App() {
         <Box pt={{ base: 6, md: 10 }}>
           <HeroClaim
             eyebrow={`r/datascience salary threads · ${YEAR_RANGE_LABEL}`}
-            title="The ladder is intact. The latest signal is loud."
-            description="The refreshed threads tell a sharper, less tidy story: pay climbed into 2023, base salary softened in 2024 while total comp kept edging up, and 2025 jumps hard on the smallest sample. The spike matters — it just does not get to pretend it is settled law."
+            title="The pay ladder still holds. The end of the line gets noisy."
+            description="Taken as one run of data, the shape is pretty clear. Pay climbs into 2023. Base softens in 2024. Then the line jumps right where the sample gets thinnest. Worth paying attention to. Not something I'd call settled."
             statLabel={filterMode ? "Current filtered slice" : "Current full-dataset read"}
             statValue={summary.medianBase ? fmtK(summary.medianBase) : "N/A"}
             statSubline={growthLine}
             facts={heroFacts}
-            scopeNote={filterMode ? "Full-dataset thesis; filtered view below tests this slice. When the evidence gets thin, the UI drops back to caveats instead of pretending confidence." : undefined}
+            scopeNote={filterMode ? "This slice can sharpen the read or make it weird. When the sample gets thin, the UI backs off instead of bluffing." : undefined}
             contextItems={heroContextItems}
           />
         </Box>
@@ -125,8 +125,8 @@ export default function App() {
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
             eyebrow="Chapter 01 / repricing"
-            title="The curve no longer has one clean break."
-            description="The old story was a simple repricing jump. The refreshed version is more interesting: gradual lift, a 2024 wobble, then a 2025 acceleration that deserves attention and a caveat in the same breath."
+            title="The trend line stopped being tidy."
+            description="This is not one clean repricing jump. It is a longer run: steady lift, a 2024 dip in base pay, then a jump at the thin end of the series that is real enough to notice and small enough to treat carefully."
           />
           <SalaryByYear records={filteredRecords} hasActiveFilters={filterMode} />
           <KPICards facts={facts} />
@@ -138,7 +138,7 @@ export default function App() {
           <SectionHeader
             eyebrow="Chapter 02 / upside"
             title="The upside still belongs to the top of the ladder."
-            description="The broad salary ladder survives the data refresh. Analysts sit lower, data scientists anchor the middle, and leadership plus senior tracks pull the ceiling upward — especially when total comp enters the room."
+            description="The broad ladder is still easy to see. Analysts sit lower. Data scientists fill the middle. Leadership and senior tracks are where total comp starts to get noticeably fatter."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1fr 1.15fr" }} gap="6">
             <RolePayComparison records={filteredRecords} />
@@ -151,8 +151,8 @@ export default function App() {
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
             eyebrow="Chapter 03 / market bends"
-            title="Geography still bends the read. Remote work mostly adds noise."
-            description="The dataset is still US-heavy, so global comparisons need a raised eyebrow. Remote work is common, but the premium is unstable enough that it reads more like market texture than a universal rule."
+            title="Geography still matters. Remote is messier than the hype."
+            description="This is still a US-heavy dataset, so any global takeaway needs a footnote. And the remote split is noisy enough that I'd treat it as context, not doctrine."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1.15fr 0.85fr" }} gap="6">
             <SalaryByCountry records={filteredRecords} />
@@ -167,7 +167,7 @@ export default function App() {
           <SectionHeader
             eyebrow="Chapter 04 / thread voice"
             title="The threads help explain the mood — not the truth."
-            description="The source material matters because it shows how people talked about salary, not just how they filled in a template. These excerpts add texture. If the slice gets weak, the quotes disappear before the caveats do."
+            description="The threads matter because they show how people talk about comp when they are not polishing it for a survey. Useful texture. Not proof on their own."
           />
           <Grid templateColumns={{ base: "1fr", xl: "1.25fr 0.75fr" }} gap="6" alignItems="start">
             <ThreadPullout quotes={quotes} hasActiveFilters={filterMode} />
@@ -181,14 +181,14 @@ export default function App() {
           <SectionHeader
             eyebrow="Chapter 05 / raw records"
             title="Now check the rows yourself."
-            description="The narrative is here to reduce noise, not to block inspection. If you want to audit the slice, download it, sort it, and see where the story holds up or starts to crack."
+            description="The prose is here to compress the noise, not hide the rows. Download the slice, sort it yourself, and see where the argument holds up."
           />
           <DataTable records={filteredRecords} />
         </Box>
 
         <Box textAlign="center" pb="4">
           <Text className="story-eyebrow" color="var(--story-reddit)">
-            Built with React + Chakra UI + Recharts · authored for skeptical readers, not dashboard wallpaper.
+            Built with React + Chakra UI + Recharts · for people who read charts with one eyebrow up.
           </Text>
         </Box>
       </Box>

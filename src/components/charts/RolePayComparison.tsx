@@ -29,7 +29,7 @@ export default function RolePayComparison({ records }: Props) {
         Leadership pulls the ceiling upward.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
-        The dataset is data-scientist heavy, but the ladder is still visible. Leadership sits farthest right; analysts sit lower; the middle of the market is where most of the sample lives.
+        This dataset leans heavily toward data scientists, but the pay ladder is still obvious. Analysts sit lower. Leadership sits meaningfully higher. Most of the sample is in the messy middle.
       </Text>
 
       <VStack align="stretch" gap="4">

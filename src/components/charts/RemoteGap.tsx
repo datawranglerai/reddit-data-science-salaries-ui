@@ -16,10 +16,10 @@ export default function RemoteGap({ records }: Props) {
         Remote premium
       </Text>
       <Text className="story-display" fontSize={{ base: "1.5rem", md: "1.9rem" }} lineHeight="1" mb="3">
-        Remote work is common. The premium is not clean.
+        Remote work is common. The pay signal is messy.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="sm" lineHeight="1.7" mb="4">
-        Missing and hybrid labels make this a noisy split. Use it as a tension line, not proof that remote work universally pays more.
+        Missing labels, hybrid answers, and tiny on-site counts make this one noisy. Useful context. Bad hill to die on.
       </Text>
 
       <Grid templateColumns={{ base: "repeat(2, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))" }} gap="3">

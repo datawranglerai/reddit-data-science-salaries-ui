@@ -126,13 +126,13 @@ export default function FilterBar({ filters, options, filteredCount, totalCount,
       <Flex justify="space-between" align={{ base: "flex-start", lg: "center" }} gap="4" mb="4" flexDirection={{ base: "column", lg: "row" }}>
         <Box>
           <Text className="story-eyebrow" mb="2">
-            Interrogate the data
+            Pressure-test the story
           </Text>
           <Text color="var(--story-text)" fontSize={{ base: "md", md: "lg" }} fontWeight="600">
             {filteredCount.toLocaleString()} of {totalCount.toLocaleString()} rendered records in this slice.
           </Text>
           <Text color="var(--story-text-muted)" fontSize="sm" mt="1">
-            Filters change the evidence and the explorer. They do not rewrite the full-dataset thesis.
+            Filters change the evidence. They do not magically rescue a bad claim.
           </Text>
         </Box>
 

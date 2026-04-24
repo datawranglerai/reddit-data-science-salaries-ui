@@ -7,23 +7,23 @@ export default function MethodologyBlock() {
         Methodology / caveats
       </Text>
       <Text className="story-display" fontSize={{ base: "1.75rem", md: "2.4rem" }} lineHeight="1" mb="4">
-        Discussion data is useful — but it isn’t payroll truth.
+        Useful data. Not payroll scripture.
       </Text>
       <List.Root gap="3" color="var(--story-text-muted)">
         <List.Item>
-          Salaries are community-reported and may be incomplete, selective, or embellished.
+          Salaries are self-reported, which means some are incomplete, some are selective, and a few are probably flattering to the narrator.
         </List.Item>
         <List.Item>
-          USD figures are normalized using approximate exchange rates, which is enough for narrative comparison but not precise compensation accounting.
+          USD figures use rough exchange-rate normalization. Good enough for comparison. Not good enough for pretending this is payroll accounting.
         </List.Item>
         <List.Item>
-          Strong claims are deliberately suppressed when filtered sample sizes get too small.
+          Strong claims get pulled back when filtered sample sizes get too small. No heroic extrapolation.
         </List.Item>
         <List.Item>
-          The 2025 thread is included, but it is the smallest yearly slice; its jump is framed as a latest signal rather than a settled market reset.
+          The 2025 slice is the smallest yearly slice in the set. So that jump reads as a live signal, not a new law of physics.
         </List.Item>
         <List.Item>
-          Reddit excerpts are treated as source texture. If they are weak, sparse, or too anecdotal, the UI falls back to metadata instead.
+          Reddit excerpts are here for texture, not proof. If they get too thin or too anecdotal, the UI falls back to metadata instead.
         </List.Item>
       </List.Root>
     </Box>

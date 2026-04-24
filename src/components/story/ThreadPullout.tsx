@@ -37,12 +37,12 @@ export default function ThreadPullout({ quotes, hasActiveFilters }: Props) {
           Source context fallback
         </Text>
         <Text color="var(--story-text)" fontSize={{ base: "lg", md: "xl" }} lineHeight="1.5">
-          The current filter slice is too thin for a strong pull quote.
+          This slice is too thin for a quote worth leaning on.
         </Text>
         <Text mt="3" color="var(--story-text-muted)" fontSize="sm" lineHeight="1.7">
           {hasActiveFilters
-            ? "The story stays intact, but this slice falls back to metadata rather than pretending one comment can stand in for the whole market."
-            : "This project uses Reddit thread voices as texture, not proof. When a quote is weak or noisy, the UI should prefer context and caveats instead."}
+            ? "The broader story may still hold, but this slice falls back to metadata instead of pretending one comment can carry the whole market."
+            : "These thread voices are here for texture, not proof. When a quote is weak or noisy, context beats theatrics."}
         </Text>
       </Box>
     );

@@ -18,10 +18,10 @@ export default function SalaryByCountry({ records }: Props) {
         Geography / ceiling check
       </Text>
       <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.35rem" }} lineHeight="1" mb="3">
-        Location still bends the story — even after USD normalization.
+        Geography still warps the market, even after the USD cleanup.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
-        The ranking is useful, but the real point is not who wins one leaderboard. It is that the market clearly does not clear at one global price.
+        Converting everything to dollars helps. It does not magically turn this into one neat global pay table.
       </Text>
 
       <VStack align="stretch" gap="4">

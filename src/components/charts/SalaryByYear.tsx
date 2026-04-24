@@ -40,10 +40,10 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
         Repricing / yearly evidence
       </Text>
       <Text className="story-display" fontSize={{ base: "2rem", md: "2.8rem" }} lineHeight="0.98" mb="3">
-        Data science pay climbed, wobbled, then flashed hot.
+        The line goes up. Then it gets weird.
       </Text>
       <Text color="var(--story-text-muted)" fontSize={{ base: "md", md: "lg" }} lineHeight="1.7" maxW="58ch">
-        The refreshed dataset is no longer a single-break story. Base pay rises into 2023, dips in 2024, then jumps in 2025 — a strong latest signal with a smaller sample behind it.
+        Across the full run, this is not a clean hockey-stick story. Base pay climbs into 2023, slips in 2024, then jumps in 2025. Interesting, yes. Settled, no.
       </Text>
 
       <HStack gap="4" mt="5" mb="5" flexWrap="wrap">
@@ -60,7 +60,7 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
         <Box>
           <Text className="story-eyebrow" mb="1">Story status</Text>
           <Text color={strongNarrative ? "var(--story-success)" : "var(--story-warning)"} fontWeight="700" fontSize="xl">
-            {strongNarrative ? (latestIsThin ? "Latest signal" : "Claim holds") : "Thin slice"}
+            {strongNarrative ? (latestIsThin ? "Thin tail" : "Claim holds") : "Thin slice"}
           </Text>
         </Box>
       </HStack>
@@ -75,7 +75,7 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
               x={String(inflection.year)}
               stroke="var(--story-tertiary)"
               strokeDasharray="3 3"
-              label={{ value: hasActiveFilters ? `${inflection.year} lift in this slice` : `${inflection.year} latest-year jump`, fill: "#ffd8bf", fontSize: 11 }}
+              label={{ value: hasActiveFilters ? `${inflection.year} bump in this slice` : `${inflection.year} bump`, fill: "#ffd8bf", fontSize: 11 }}
             />
           )}
           <Tooltip
@@ -106,9 +106,9 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
       <Text mt="4" color="var(--story-text-muted)" fontSize="sm" lineHeight="1.7">
         {strongNarrative
           ? latestIsThin
-            ? "The latest-year jump clears the chart threshold, but its sample is thinner than the earlier years. Treat it as a directional signal, not a settled market reset."
-            : "The claim is allowed because the filtered slice still clears the minimum record thresholds for the years doing the explanatory work."
-          : "This slice no longer clears the narrative threshold. Keep reading the data, but treat the storyline as full-dataset framing rather than a strong claim about this exact subset."}
+            ? "The jump at the end clears the threshold, but the sample is thinner than the earlier years. Call it a signal, not gospel."
+            : "This slice is still thick enough to support the story instead of just hinting at it."
+          : "This slice is too thin for a strong claim. Read the chart, but keep your eyebrow up."}
       </Text>
     </Box>
   );

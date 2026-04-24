@@ -26,10 +26,10 @@ export default function IndustryHeatmap({ records }: Props) {
         Industry ceilings
       </Text>
       <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.35rem" }} lineHeight="1" mb="3">
-        Industry still changes who gets range.
+        Industry changes the slope, not just the average.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5" maxW="60ch">
-        A market with one clean salary ladder would not produce this pattern. Some industries pay up early; others only open up once seniority crosses a threshold.
+        If every company paid on one neat ladder, this chart would be boring. It isn't. Some industries pay up early; others only open up once seniority crosses a threshold.
       </Text>
 
       <Box overflowX="auto">

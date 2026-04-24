@@ -17,10 +17,10 @@ export default function SalaryByStage({ records }: Props) {
         Seniority spread
       </Text>
       <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.4rem" }} lineHeight="1" mb="3">
-        Seniority still does most of the explanatory work.
+        Seniority still does most of the heavy lifting.
       </Text>
       <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
-        Each bar shows the P25–P75 range. The square marker is the median. The refreshed data still separates hardest once senior, lead, and management roles enter the sample.
+        Each bar shows the P25–P75 range, with the square marking the median. Once senior, lead, and management roles show up, comp spreads out fast. No mystery there.
       </Text>
 
       <VStack align="stretch" gap="5">
