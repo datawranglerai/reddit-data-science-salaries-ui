@@ -34,3 +34,106 @@ export interface FilterState {
   remoteOnly: boolean;
   educations: string[];
 }
+
+export interface RawSourceRecord {
+  title?: string | null;
+  level?: string | null;
+  salary?: number | string | null;
+  total_comp?: number | string | null;
+  currency?: string | null;
+  country?: string | null;
+  city?: string | null;
+  company_industry?: string | null;
+  education?: string | null;
+  is_remote?: boolean | string | null;
+  thread_title?: string | null;
+  location_string?: string | null;
+  original_body?: string | null;
+  upvotes?: number | null;
+  comment_url?: string | null;
+  created_at?: string | null;
+}
+
+export interface SourceContextRecord {
+  year: number;
+  title: string;
+  careerStage: string;
+  roleType: string;
+  country: string;
+  companyIndustry: string;
+  education: string;
+  isRemote: boolean;
+  location: string;
+  body: string;
+  upvotes: number;
+  commentUrl: string;
+  createdAt: string;
+}
+
+export interface QuoteCandidate {
+  quote: string;
+  year: number;
+  title: string;
+  companyIndustry: string;
+  location: string;
+  upvotes: number;
+  commentUrl: string;
+}
+
+export interface StorySummary {
+  totalRecords: number;
+  totalCountries: number;
+  remotePercent: number;
+  medianBase: number | null;
+  medianTotalComp: number | null;
+  earliestYear: number | null;
+  latestYear: number | null;
+  earliestMedian: number | null;
+  latestMedian: number | null;
+  growthPercent: number | null;
+}
+
+export interface YearNarrativePoint {
+  year: number;
+  label: string;
+  base: number | null;
+  totalComp: number | null;
+  baseCount: number;
+  totalCompCount: number;
+}
+
+export interface RoleNarrativePoint {
+  role: string;
+  median: number;
+  count: number;
+  share: number;
+}
+
+export interface StageNarrativePoint {
+  stage: string;
+  p25: number;
+  median: number;
+  p75: number;
+  count: number;
+}
+
+export interface CountryNarrativePoint {
+  country: string;
+  median: number;
+  count: number;
+}
+
+export interface RemoteNarrativePoint {
+  year: number;
+  label: string;
+  remote: number | null;
+  onsite: number | null;
+  remoteCount: number;
+  onsiteCount: number;
+}
+
+export interface IndustryNarrativeRow {
+  industry: string;
+  values: Record<string, number | null>;
+  totalCount: number;
+}

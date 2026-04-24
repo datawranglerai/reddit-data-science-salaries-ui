@@ -1,65 +1,55 @@
-import { Box, Text } from "@chakra-ui/react";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-} from "recharts";
+import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import type { ProcessedRecord } from "../../types";
-import { median, percentile } from "../../utils/dataUtils";
+import { fmtK } from "../../utils/dataUtils";
+import { getStageNarrative } from "../../utils/storyData";
 
-const SURFACE = "#1e2130";
-const BORDER = "#2a2f45";
-const ACCENT1 = "#6366f1";
-const ACCENT2 = "#14b8a6";
-const TEXT = "#e2e8f0";
-const MUTED = "#94a3b8";
-
-const STAGE_ORDER = ["Entry", "Mid", "Senior", "Lead/Staff", "Manager/Director", "Director+"];
-
-interface Props { records: ProcessedRecord[] }
+interface Props {
+  records: ProcessedRecord[];
+}
 
 export default function SalaryByStage({ records }: Props) {
-  const stageMap: Record<string, number[]> = {};
-  records.forEach((r) => {
-    if (r.usdSalary && r.usdSalary > 0 && r.careerStage) {
-      if (!stageMap[r.careerStage]) stageMap[r.careerStage] = [];
-      stageMap[r.careerStage].push(r.usdSalary);
-    }
-  });
-
-  const data = STAGE_ORDER.filter((s) => stageMap[s]?.length >= 2).map((stage) => {
-    const salaries = stageMap[stage];
-    return {
-      stage: stage.replace("/", "/\u200B"),
-      p25: Math.round(percentile(salaries, 25) / 1000),
-      median: Math.round(median(salaries) / 1000),
-      p75: Math.round(percentile(salaries, 75) / 1000),
-    };
-  });
+  const data = getStageNarrative(records);
+  const maxValue = Math.max(...data.map((item) => item.p75), 1);
 
   return (
-    <Box bg={SURFACE} border="1px solid" borderColor={BORDER} borderRadius="xl" p="5">
-      <Text fontWeight="600" color={TEXT} mb="1" fontSize="sm">Salary by Career Stage</Text>
-      <Text fontSize="xs" color={MUTED} mb="4">P25 / Median / P75 base salary in USD</Text>
-      <ResponsiveContainer width="100%" height={240}>
-        <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={BORDER} />
-          <XAxis dataKey="stage" tick={{ fill: MUTED, fontSize: 10 }} axisLine={false} tickLine={false} />
-          <YAxis
-            tickFormatter={(v) => `$${v}k`}
-            tick={{ fill: MUTED, fontSize: 10 }}
-            axisLine={false}
-            tickLine={false}
-            width={44}
-          />
-          <Tooltip
-            contentStyle={{ background: "#111827", border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT, fontSize: 12 }}
-            formatter={(val: number) => [`$${val}k`, undefined]}
-          />
-          <Legend wrapperStyle={{ fontSize: 11, color: MUTED, paddingTop: 8 }} />
-          <Bar dataKey="p25" name="P25" fill={`${ACCENT1}66`} radius={[2, 2, 0, 0]} maxBarSize={24} />
-          <Bar dataKey="median" name="Median" fill={ACCENT1} radius={[2, 2, 0, 0]} maxBarSize={24} />
-          <Bar dataKey="p75" name="P75" fill={ACCENT2} radius={[2, 2, 0, 0]} maxBarSize={24} />
-        </BarChart>
-      </ResponsiveContainer>
+    <Box className="story-surface" borderRadius="12px" p={{ base: 5, md: 6 }}>
+      <Text className="story-eyebrow" mb="3">
+        Seniority spread
+      </Text>
+      <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.4rem" }} lineHeight="1" mb="3">
+        Seniority still matters. The spread just gets wider higher up.
+      </Text>
+      <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
+        Each bar shows the P25–P75 range. The square marker is the median. Once you hit lead and manager/director territory, the room for variance gets a lot bigger.
+      </Text>
+
+      <VStack align="stretch" gap="5">
+        {data.map((item) => {
+          const p25 = (item.p25 / maxValue) * 100;
+          const p75 = (item.p75 / maxValue) * 100;
+          const median = (item.median / maxValue) * 100;
+          return (
+            <Box key={item.stage}>
+              <Flex justify="space-between" gap="4" mb="2" align="baseline" flexWrap="wrap">
+                <Text color="var(--story-text)" fontWeight="700" fontSize="sm">
+                  {item.stage}
+                </Text>
+                <Text color="var(--story-text-muted)" fontSize="sm">
+                  median {fmtK(item.median)} · n={item.count}
+                </Text>
+              </Flex>
+              <Box position="relative" h="24px" bg="rgba(255,255,255,0.04)" borderRadius="999px">
+                <Box position="absolute" left={`${p25}%`} width={`${Math.max(p75 - p25, 3)}%`} top="7px" h="10px" bg="rgba(83,224,255,0.22)" borderRadius="999px" />
+                <Box position="absolute" left={`calc(${median}% - 6px)`} top="4px" w="12px" h="16px" bg="var(--story-primary)" borderRadius="3px" />
+              </Box>
+              <Flex justify="space-between" mt="2" color="var(--story-text-muted)" fontSize="xs">
+                <Text>P25 {fmtK(item.p25)}</Text>
+                <Text>P75 {fmtK(item.p75)}</Text>
+              </Flex>
+            </Box>
+          );
+        })}
+      </VStack>
     </Box>
   );
 }

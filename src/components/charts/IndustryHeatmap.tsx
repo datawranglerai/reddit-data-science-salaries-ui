@@ -1,82 +1,73 @@
-import { Box, Text, Grid } from "@chakra-ui/react";
+import { Box, Grid, Text } from "@chakra-ui/react";
 import type { ProcessedRecord } from "../../types";
-import { median } from "../../utils/dataUtils";
+import { fmtK } from "../../utils/dataUtils";
+import { getIndustryNarrative, STAGE_ORDER } from "../../utils/storyData";
 
-const SURFACE = "#1e2130";
-const BORDER = "#2a2f45";
-const ACCENT1 = "#6366f1";
-const ACCENT2 = "#14b8a6";
-const TEXT = "#e2e8f0";
-const MUTED = "#94a3b8";
+interface Props {
+  records: ProcessedRecord[];
+}
 
-const STAGE_ORDER = ["Entry", "Mid", "Senior", "Lead/Staff", "Manager/Director"];
-
-interface Props { records: ProcessedRecord[] }
-
-function getColor(value: number | null, min: number, max: number): string {
-  if (value === null) return "#2a2f45";
-  const t = max === min ? 0.5 : (value - min) / (max - min);
-  const r = Math.round(99 + t * (20 - 99));
-  const g = Math.round(102 + t * (184 - 102));
-  const b = Math.round(241 + t * (166 - 241));
-  return `rgb(${r},${g},${b})`;
+function getHeatColor(value: number | null, min: number, max: number): string {
+  if (value === null) return "rgba(255,255,255,0.04)";
+  const ratio = max === min ? 0.5 : (value - min) / (max - min);
+  const alpha = 0.16 + ratio * 0.34;
+  return `rgba(83, 224, 255, ${alpha.toFixed(2)})`;
 }
 
 export default function IndustryHeatmap({ records }: Props) {
-  const industrySet = new Set<string>();
-  records.forEach((r) => { if (r.company_industry) industrySet.add(r.company_industry); });
-  const industries = Array.from(industrySet).sort();
-
-  const cellData: Record<string, Record<string, number | null>> = {};
-  const allValues: number[] = [];
-
-  industries.forEach((ind) => {
-    cellData[ind] = {};
-    STAGE_ORDER.forEach((stage) => {
-      const vals = records
-        .filter((r) => r.company_industry === ind && r.careerStage === stage)
-        .map((r) => r.usdSalary)
-        .filter((v): v is number => v !== null && v > 0);
-      cellData[ind][stage] = vals.length >= 2 ? Math.round(median(vals) / 1000) : null;
-      if (vals.length >= 2) allValues.push(Math.round(median(vals) / 1000));
-    });
-  });
-
-  const min = Math.min(...allValues);
-  const max = Math.max(...allValues);
+  const rows = getIndustryNarrative(records);
+  const allValues = rows.flatMap((row) => Object.values(row.values).filter((value): value is number => value !== null));
+  const min = Math.min(...allValues, 0);
+  const max = Math.max(...allValues, 1);
 
   return (
-    <Box bg={SURFACE} border="1px solid" borderColor={BORDER} borderRadius="xl" p="5">
-      <Text fontWeight="600" color={TEXT} mb="1" fontSize="sm">Industry × Career Stage Heatmap</Text>
-      <Text fontSize="xs" color={MUTED} mb="4">Median base salary (USD $k) — lighter = higher</Text>
+    <Box className="story-surface" borderRadius="12px" p={{ base: 5, md: 6 }}>
+      <Text className="story-eyebrow" mb="3">
+        Industry ceilings
+      </Text>
+      <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.35rem" }} lineHeight="1" mb="3">
+        Industry doesn’t just move the median. It changes who gets range.
+      </Text>
+      <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5" maxW="60ch">
+        A market with one clean salary ladder would not produce this pattern. Some industries pay up early. Others only open up when seniority crosses a threshold.
+      </Text>
+
       <Box overflowX="auto">
-        <Box minW="540px">
-          <Grid templateColumns={`160px repeat(${STAGE_ORDER.length}, 1fr)`} gap="1" mb="1">
+        <Box minW="760px">
+          <Grid templateColumns={`180px repeat(${STAGE_ORDER.length}, minmax(96px, 1fr))`} gap="2" mb="2">
             <Box />
-            {STAGE_ORDER.map((s) => (
-              <Text key={s} fontSize="9px" color={MUTED} textAlign="center" fontWeight="600" lineHeight="1.2">
-                {s}
+            {STAGE_ORDER.map((stage) => (
+              <Text key={stage} className="story-eyebrow" textAlign="center">
+                {stage}
               </Text>
             ))}
           </Grid>
-          {industries.slice(0, 12).map((ind) => (
-            <Grid key={ind} templateColumns={`160px repeat(${STAGE_ORDER.length}, 1fr)`} gap="1" mb="1">
-              <Text fontSize="10px" color={TEXT} noOfLines={1} lineHeight="2.2" pr="2">{ind}</Text>
+          {rows.map((row) => (
+            <Grid key={row.industry} templateColumns={`180px repeat(${STAGE_ORDER.length}, minmax(96px, 1fr))`} gap="2" mb="2">
+              <Box py="2">
+                <Text color="var(--story-text)" fontWeight="700" fontSize="sm">
+                  {row.industry}
+                </Text>
+                <Text color="var(--story-text-muted)" fontSize="xs">
+                  n={row.totalCount}
+                </Text>
+              </Box>
               {STAGE_ORDER.map((stage) => {
-                const val = cellData[ind][stage];
-                const bg = getColor(val, min, max);
+                const value = row.values[stage];
                 return (
                   <Box
-                    key={stage}
-                    bg={bg}
-                    borderRadius="sm"
-                    h="7"
+                    key={`${row.industry}-${stage}`}
+                    bg={getHeatColor(value, min, max)}
+                    border="1px solid"
+                    borderColor="rgba(67,61,75,0.45)"
+                    borderRadius="6px"
+                    minH="56px"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <Text fontSize="9px" color={val !== null ? "rgba(0,0,0,0.8)" : MUTED} fontWeight="600">
-                      {val !== null ? `$${val}k` : "—"}
+                    <Text color={value ? "#061419" : "var(--story-text-muted)"} fontWeight="700" fontSize="xs">
+                      {value ? fmtK(value) : "—"}
                     </Text>
                   </Box>
                 );

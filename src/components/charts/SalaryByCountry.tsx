@@ -1,75 +1,55 @@
-import { Box, Text } from "@chakra-ui/react";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
-} from "recharts";
+import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import type { ProcessedRecord } from "../../types";
-import { median } from "../../utils/dataUtils";
+import { fmtK } from "../../utils/dataUtils";
+import { getCountryNarrative, getStorySummary } from "../../utils/storyData";
 
-const SURFACE = "#1e2130";
-const BORDER = "#2a2f45";
-const ACCENT1 = "#6366f1";
-const TEXT = "#e2e8f0";
-const MUTED = "#94a3b8";
-
-interface Props { records: ProcessedRecord[] }
+interface Props {
+  records: ProcessedRecord[];
+}
 
 export default function SalaryByCountry({ records }: Props) {
-  const countryMap: Record<string, number[]> = {};
-  records.forEach((r) => {
-    if (r.usdSalary && r.usdSalary > 0 && r.country) {
-      if (!countryMap[r.country]) countryMap[r.country] = [];
-      countryMap[r.country].push(r.usdSalary);
-    }
-  });
-
-  const data = Object.entries(countryMap)
-    .map(([country, salaries]) => ({
-      country,
-      median: Math.round(median(salaries) / 1000),
-      count: salaries.length,
-    }))
-    .filter((d) => d.count >= 2)
-    .sort((a, b) => b.median - a.median)
-    .slice(0, 10);
-
-  const allSalaries = records.map((r) => r.usdSalary).filter((v): v is number => v !== null && v > 0);
-  const overallMedian = allSalaries.length ? Math.round(median(allSalaries) / 1000) : 0;
+  const data = getCountryNarrative(records);
+  const summary = getStorySummary(records);
+  const maxMedian = Math.max(...data.map((item) => item.median), 1);
 
   return (
-    <Box bg={SURFACE} border="1px solid" borderColor={BORDER} borderRadius="xl" p="5">
-      <Text fontWeight="600" color={TEXT} mb="1" fontSize="sm">Salary by Country</Text>
-      <Text fontSize="xs" color={MUTED} mb="4">Top 10 countries by median base salary (USD)</Text>
-      <ResponsiveContainer width="100%" height={280}>
-        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={BORDER} horizontal={false} />
-          <XAxis
-            type="number"
-            tickFormatter={(v) => `$${v}k`}
-            tick={{ fill: MUTED, fontSize: 10 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            type="category"
-            dataKey="country"
-            tick={{ fill: TEXT, fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-            width={72}
-          />
-          <Tooltip
-            contentStyle={{ background: "#111827", border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT, fontSize: 12 }}
-            formatter={(val: number, _name, props) => [`$${val}k (n=${props.payload.count})`, "Median Salary"]}
-          />
-          <ReferenceLine
-            x={overallMedian}
-            stroke="#f59e0b"
-            strokeDasharray="4 3"
-            label={{ value: "Overall Median", position: "insideTopRight", fill: "#f59e0b", fontSize: 10 }}
-          />
-          <Bar dataKey="median" fill={ACCENT1} radius={[0, 4, 4, 0]} maxBarSize={20} />
-        </BarChart>
-      </ResponsiveContainer>
+    <Box className="story-surface" borderRadius="12px" p={{ base: 5, md: 6 }}>
+      <Text className="story-eyebrow" mb="3">
+        Geography / ceiling check
+      </Text>
+      <Text className="story-display" fontSize={{ base: "1.8rem", md: "2.35rem" }} lineHeight="1" mb="3">
+        Location still bends the story — even after USD normalization.
+      </Text>
+      <Text color="var(--story-text-muted)" fontSize="md" lineHeight="1.7" mb="5">
+        The ranking is useful, but the real point is not who wins one leaderboard. It is that the market clearly does not clear at one global price.
+      </Text>
+
+      <VStack align="stretch" gap="4">
+        {data.map((item) => (
+          <Box key={item.country}>
+            <Flex justify="space-between" gap="4" mb="2" align="baseline" flexWrap="wrap">
+              <Text color="var(--story-text)" fontWeight="700" fontSize="sm">
+                {item.country}
+              </Text>
+              <Text color="var(--story-primary-soft)" fontWeight="700" fontSize="sm">
+                {fmtK(item.median)} · n={item.count}
+              </Text>
+            </Flex>
+            <Box h="10px" bg="rgba(255,255,255,0.05)" borderRadius="999px" overflow="hidden" position="relative">
+              <Box h="full" width={`${(item.median / maxMedian) * 100}%`} bg="linear-gradient(90deg, var(--story-primary), var(--story-secondary))" borderRadius="999px" />
+              {summary.medianBase && (
+                <Box position="absolute" left={`${(summary.medianBase / maxMedian) * 100}%`} top="-2px" bottom="-2px" w="2px" bg="var(--story-warning)" />
+              )}
+            </Box>
+          </Box>
+        ))}
+      </VStack>
+
+      {summary.medianBase && (
+        <Text mt="4" color="var(--story-text-muted)" fontSize="sm">
+          Overall median in this slice: <Box as="span" color="var(--story-warning)" fontWeight="700">{fmtK(summary.medianBase)}</Box>
+        </Text>
+      )}
     </Box>
   );
 }

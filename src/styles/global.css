@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+
+:root {
+  --story-bg: #0b0b0d;
+  --story-surface: #131316;
+  --story-surface-dim: #101013;
+  --story-surface-bright: #1c1c22;
+  --story-surface-hi: #23232b;
+  --story-border: #433d4b;
+  --story-border-strong: #8b8396;
+  --story-text: #f5f2ef;
+  --story-text-muted: #a9a1ad;
+  --story-grid: #2b2731;
+  --story-primary: #b76dff;
+  --story-primary-soft: #f1dcff;
+  --story-secondary: #53e0ff;
+  --story-secondary-soft: #b9f3ff;
+  --story-tertiary: #ff7a1a;
+  --story-tertiary-soft: #ffd8bf;
+  --story-reddit: #ff5a36;
+  --story-success: #67f7b1;
+  --story-warning: #ffd166;
+  --story-shadow: 8px 8px 0 rgba(10, 10, 13, 0.55);
+  --story-radius: 6px;
+  --story-space-1: 4px;
+  --story-space-2: 8px;
+  --story-space-3: 12px;
+  --story-space-4: 16px;
+  --story-space-5: 24px;
+  --story-space-6: 32px;
+  --story-space-7: 48px;
+  --story-space-8: 72px;
+  --story-space-9: 96px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(83, 224, 255, 0.08), transparent 24%),
+    radial-gradient(circle at top left, rgba(183, 109, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, #121218 0%, var(--story-bg) 18%, #08080a 100%);
+  color: var(--story-text);
+}
+
+a {
+  color: inherit;
+}
+
+.story-shell {
+  width: min(1220px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.story-surface {
+  background: linear-gradient(180deg, rgba(28, 28, 34, 0.96), rgba(16, 16, 19, 0.98));
+  border: 1px solid var(--story-border);
+  box-shadow: var(--story-shadow);
+}
+
+.story-surface-quiet {
+  background: rgba(19, 19, 22, 0.72);
+  border: 1px solid rgba(67, 61, 75, 0.65);
+}
+
+.story-display {
+  font-family: "Space Grotesk", Inter, sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.story-eyebrow {
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--story-text-muted);
+}
+
+.story-caption {
+  color: var(--story-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.story-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--story-border);
+  border-radius: 4px;
+  background: rgba(19, 19, 22, 0.9);
+  color: var(--story-text-muted);
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.story-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(67, 61, 75, 0), rgba(67, 61, 75, 1), rgba(67, 61, 75, 0));
+}
+
+.story-glow-primary {
+  text-shadow: 0 0 18px rgba(183, 109, 255, 0.28);
+}
+
+.story-glow-secondary {
+  text-shadow: 0 0 18px rgba(83, 224, 255, 0.25);
+}
+
+.story-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}

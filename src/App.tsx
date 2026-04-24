@@ -1,29 +1,33 @@
 import { useMemo, useState } from "react";
-import { Box, Text, HStack, Flex } from "@chakra-ui/react";
+import { Box, Grid, Text } from "@chakra-ui/react";
 
-import rawData from "./data/processed_salary_data_v2.json";
-import { processRecords, applyFilters } from "./utils/dataUtils";
-import type { FilterState, SalaryRecord } from "./types";
+import processedData from "./data/processed_salary_data_v2.json";
+import originalData from "./data/original_salary_data.json";
+import { applyFilters, fmtK, processRecords } from "./utils/dataUtils";
+import {
+  buildSourceContext,
+  filterSourceContext,
+  getActiveFilterTags,
+  getStorySummary,
+  getSupportFacts,
+  getQuoteCandidates,
+  hasActiveFilters,
+} from "./utils/storyData";
+import type { FilterState, RawSourceRecord, SalaryRecord } from "./types";
 
 import FilterBar from "./components/FilterBar";
 import KPICards from "./components/KPICards";
 import SalaryByYear from "./components/charts/SalaryByYear";
 import SalaryByCountry from "./components/charts/SalaryByCountry";
-import RoleTypeDonut from "./components/charts/RoleTypeDonut";
+import RolePayComparison from "./components/charts/RolePayComparison";
 import SalaryByStage from "./components/charts/SalaryByStage";
 import IndustryHeatmap from "./components/charts/IndustryHeatmap";
-import EducationPremium from "./components/charts/EducationPremium";
-import SalaryScatter from "./components/charts/SalaryScatter";
 import RemoteGap from "./components/charts/RemoteGap";
 import DataTable from "./components/DataTable";
-
-const BG = "#0f1117";
-const SURFACE = "#1e2130";
-const BORDER = "#2a2f45";
-const REDDIT = "#ff4500";
-const TEXT = "#e2e8f0";
-const MUTED = "#94a3b8";
-const ACCENT1 = "#6366f1";
+import HeroClaim from "./components/story/HeroClaim";
+import MethodologyBlock from "./components/story/MethodologyBlock";
+import SectionHeader from "./components/story/SectionHeader";
+import ThreadPullout from "./components/story/ThreadPullout";
 
 const DEFAULT_FILTERS: FilterState = {
   years: [],
@@ -35,7 +39,8 @@ const DEFAULT_FILTERS: FilterState = {
   educations: [],
 };
 
-const ALL_RECORDS = processRecords(rawData as SalaryRecord[]);
+const ALL_RECORDS = processRecords(processedData as SalaryRecord[]);
+const ALL_SOURCE_CONTEXT = buildSourceContext(originalData as RawSourceRecord[]);
 
 function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr)).filter(Boolean) as T[];
@@ -44,112 +49,130 @@ function unique<T>(arr: T[]): T[] {
 export default function App() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
-  const filterOptions = useMemo(() => ({
-    years: unique(ALL_RECORDS.map((r) => String(r.year)).filter((y) => y !== "0")).sort(),
-    countries: unique(ALL_RECORDS.map((r) => r.country)).sort(),
-    careerStages: ["Entry", "Mid", "Senior", "Lead/Staff", "Manager/Director", "Director+"],
-    roleTypes: unique(ALL_RECORDS.map((r) => r.roleType)).sort(),
-    industries: unique(ALL_RECORDS.map((r) => r.company_industry)).sort(),
-    educations: unique(ALL_RECORDS.map((r) => r.education)).sort(),
-  }), []);
+  const filterOptions = useMemo(
+    () => ({
+      years: unique(ALL_RECORDS.map((record) => String(record.year)).filter((year) => year !== "0")).sort(),
+      countries: unique(ALL_RECORDS.map((record) => record.country)).sort(),
+      careerStages: ["Entry", "Mid", "Senior", "Lead/Staff", "Manager/Director", "Director+"],
+      roleTypes: unique(ALL_RECORDS.map((record) => record.roleType)).sort(),
+      industries: unique(ALL_RECORDS.map((record) => record.company_industry)).sort(),
+      educations: unique(ALL_RECORDS.map((record) => record.education)).sort(),
+    }),
+    [],
+  );
 
-  const filtered = useMemo(() => applyFilters(ALL_RECORDS, filters), [filters]);
+  const filteredRecords = useMemo(() => applyFilters(ALL_RECORDS, filters), [filters]);
+  const filteredSourceContext = useMemo(() => filterSourceContext(ALL_SOURCE_CONTEXT, filters), [filters]);
+  const summary = useMemo(() => getStorySummary(filteredRecords), [filteredRecords]);
+  const activeFilterTags = useMemo(() => getActiveFilterTags(filters), [filters]);
+  const facts = useMemo(() => getSupportFacts(filteredRecords), [filteredRecords]);
+  const quotes = useMemo(() => getQuoteCandidates(filteredSourceContext, 2), [filteredSourceContext]);
+  const filterMode = hasActiveFilters(filters);
+
+  const heroFacts = [
+    { label: "Rendered records", value: ALL_RECORDS.length.toLocaleString() },
+    { label: "Source comments", value: (originalData as RawSourceRecord[]).length.toLocaleString() },
+    { label: "Years", value: "2020–2024" },
+  ];
+
+  const growthLine =
+    summary.growthPercent !== null && summary.earliestYear !== null && summary.latestYear !== null
+      ? `${summary.growthPercent >= 0 ? "+" : ""}${summary.growthPercent}% versus ${summary.earliestYear} inside the current slice.`
+      : `${filteredRecords.length.toLocaleString()} records currently clear the active filters.`;
 
   return (
-    <Box bg={BG} minH="100dvh" color={TEXT} fontFamily="body">
-      <Box
-        borderBottom="1px solid"
-        borderColor={BORDER}
-        bg={`${SURFACE}cc`}
-        backdropFilter="blur(16px)"
-        px={{ base: 4, md: 8 }}
-        py="5"
-      >
-        <Flex align="center" justify="space-between" maxW="1400px" mx="auto" flexWrap="wrap" gap="3">
-          <Box>
-            <HStack gap="2" mb="1">
-              <Box
-                as="span"
-                fontSize="xs"
-                fontWeight="700"
-                color={REDDIT}
-                bg={`${REDDIT}18`}
-                px="2"
-                py="0.5"
-                borderRadius="full"
-                letterSpacing="0.06em"
-              >
-                r/datascience
-              </Box>
-              <Text fontSize="xs" color={MUTED}>Community Salary Survey</Text>
-            </HStack>
-            <Text
-              fontSize={{ base: "lg", md: "2xl" }}
-              fontWeight="800"
-              color={TEXT}
-              letterSpacing="-0.02em"
-              lineHeight="1.2"
-            >
-              The Definitive{" "}
-              <Box as="span" color={REDDIT}>r/datascience</Box>{" "}
-              Salary Guide{" "}
-              <Box as="span" color={MUTED} fontWeight="400" fontSize={{ base: "md", md: "xl" }}>
-                (2020&ndash;2024)
-              </Box>
-            </Text>
-          </Box>
-          <Box textAlign={{ base: "left", md: "right" }}>
-            <Text fontSize="xs" color={MUTED}>Total Submissions</Text>
-            <Text fontSize="xl" fontWeight="700" color={ACCENT1}>
-              {ALL_RECORDS.length.toLocaleString()}
-            </Text>
-          </Box>
-        </Flex>
-      </Box>
-
-      <FilterBar
-        filters={filters}
-        options={filterOptions}
-        onChange={setFilters}
-        onReset={() => setFilters(DEFAULT_FILTERS)}
-      />
-
-      <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }} py="6">
-        <KPICards records={filtered} />
-
-        <Box mt="6" display="grid" gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap="4">
-          <SalaryByYear records={filtered} />
-          <SalaryByCountry records={filtered} />
+    <Box color="var(--story-text)" pb={{ base: 14, md: 20 }}>
+      <Box className="story-shell" display="flex" flexDirection="column" gap="16">
+        <Box pt={{ base: 6, md: 10 }}>
+          <HeroClaim
+            eyebrow="r/datascience salary threads · 2020–2024"
+            title="Data science pay didn’t just rise — it repriced."
+            description="The old version of this app behaved like a monitor. This one is built to make an argument: the salary floor moved, the ceiling widened, and the market never really went back to its pre-2022 shape. Filters still matter — but they test the claim rather than replacing it."
+            statLabel={filterMode ? "Current filtered slice" : "Current full-dataset read"}
+            statValue={summary.medianBase ? fmtK(summary.medianBase) : "N/A"}
+            statSubline={growthLine}
+            facts={heroFacts}
+            scopeNote={filterMode ? "Full-dataset thesis; filtered view below tests this slice. When the evidence gets thin, the UI drops back to caveats instead of pretending confidence." : undefined}
+          />
         </Box>
 
-        <Box mt="4" display="grid" gridTemplateColumns={{ base: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }} gap="4">
-          <RoleTypeDonut records={filtered} />
-          <SalaryByStage records={filtered} />
-          <EducationPremium records={filtered} />
+        <FilterBar
+          filters={filters}
+          options={filterOptions}
+          filteredCount={filteredRecords.length}
+          totalCount={ALL_RECORDS.length}
+          activeTags={activeFilterTags}
+          onChange={setFilters}
+          onReset={() => setFilters(DEFAULT_FILTERS)}
+        />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="Chapter 01 / repricing"
+            title="The cleanest signal is the break in the curve."
+            description="If you only remember one thing from this page, make it this: the compensation regime changes hard in 2022. That is the closest thing the dataset has to a plot point."
+          />
+          <SalaryByYear records={filteredRecords} hasActiveFilters={filterMode} />
+          <KPICards facts={facts} />
         </Box>
 
-        <Box mt="4" display="grid" gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap="4">
-          <SalaryScatter records={filtered} />
-          <RemoteGap records={filtered} />
+        <Box className="story-divider" />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="Chapter 02 / upside"
+            title="The upside didn’t spread evenly across the stack."
+            description="Some of the premium is role-driven. Some of it is seniority-driven. And some of it is simply variance opening up once you move higher in the ladder."
+          />
+          <Grid templateColumns={{ base: "1fr", xl: "1fr 1.15fr" }} gap="6">
+            <RolePayComparison records={filteredRecords} />
+            <SalaryByStage records={filteredRecords} />
+          </Grid>
         </Box>
 
-        <Box mt="4">
-          <IndustryHeatmap records={filtered} />
+        <Box className="story-divider" />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="Chapter 03 / market bends"
+            title="Geography, industry, and remote work keep bending the market out of shape."
+            description="USD normalization smooths the rough edges, but it does not erase them. The market still clears differently across countries, industries, and work arrangements."
+          />
+          <Grid templateColumns={{ base: "1fr", xl: "1.15fr 0.85fr" }} gap="6">
+            <SalaryByCountry records={filteredRecords} />
+            <RemoteGap records={filteredRecords} />
+          </Grid>
+          <IndustryHeatmap records={filteredRecords} />
         </Box>
 
-        <Box mt="4">
-          <DataTable records={filtered} />
+        <Box className="story-divider" />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="Chapter 04 / thread voice"
+            title="The threads help explain the mood — not the truth."
+            description="The source material matters because it shows how people talked about salary, not just how they filled in a template. These excerpts are there to give the data texture. If the slice gets weak, the quotes disappear before the caveats do."
+          />
+          <Grid templateColumns={{ base: "1fr", xl: "1.25fr 0.75fr" }} gap="6" alignItems="start">
+            <ThreadPullout quotes={quotes} hasActiveFilters={filterMode} />
+            <MethodologyBlock />
+          </Grid>
         </Box>
 
-        <Box mt="8" pt="6" borderTop="1px solid" borderColor={BORDER} textAlign="center">
-          <Text fontSize="xs" color={MUTED}>
-            Data sourced from{" "}
-            <Box as="span" color={REDDIT} fontWeight="600">r/datascience</Box>
-            {" "}salary threads (2020&ndash;2024). Salaries normalized to USD using approximate annual exchange rates.
-            Community-reported data &mdash; use with appropriate skepticism.
-          </Text>
-          <Text fontSize="xs" color={`${MUTED}88`} mt="1">
-            Built with React + Recharts + Chakra UI
+        <Box className="story-divider" />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="Chapter 05 / raw records"
+            title="Now check the rows yourself."
+            description="The narrative is here to reduce noise, not to block inspection. If you want to audit the slice, download it, sort it, and see where the story holds up or starts to crack."
+          />
+          <DataTable records={filteredRecords} />
+        </Box>
+
+        <Box textAlign="center" pb="4">
+          <Text className="story-eyebrow" color="var(--story-reddit)">
+            Built with React + Chakra UI + Recharts · authored for skeptical readers, not dashboard wallpaper.
           </Text>
         </Box>
       </Box>
