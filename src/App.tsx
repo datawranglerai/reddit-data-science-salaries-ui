@@ -198,9 +198,19 @@ export default function App() {
           <DataTable records={filteredRecords} />
         </Box>
 
-        <Box textAlign="center" pb="4">
+        <Box textAlign="center" pb="4" display="flex" flexDirection="column" alignItems="center" gap="2">
           <Text className="story-eyebrow" color="var(--story-reddit)">
             Built with React + Chakra UI + Recharts · for people who read charts with one eyebrow up.
+          </Text>
+          <Text className="story-eyebrow" color="var(--story-text-muted)">
+            <a
+              href="https://github.com/datawranglerai/reddit-data-science-salaries"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: "3px" }}
+            >
+              data pipeline &amp; analysis · open-source on github ↗
+            </a>
           </Text>
         </Box>
       </Box>

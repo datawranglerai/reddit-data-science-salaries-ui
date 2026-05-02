@@ -1,5 +1,7 @@
 import { Box, List, Text } from "@chakra-ui/react";
 
+const DATA_REPO = "https://github.com/datawranglerai/reddit-data-science-salaries";
+
 export default function MethodologyBlock() {
   return (
     <Box className="story-surface-quiet" borderRadius="10px" p={{ base: 5, md: 6 }}>
@@ -26,6 +28,16 @@ export default function MethodologyBlock() {
           Reddit excerpts are here for texture, not proof. If they get too thin or too anecdotal, the UI falls back to metadata instead.
         </List.Item>
       </List.Root>
+
+      <Box mt="5" pt="4" borderTop="1px solid rgba(67,61,75,0.4)">
+        <Text color="var(--story-text-muted)" fontSize="sm" lineHeight="1.7">
+          Want to reproduce or adapt the dataset?{" "}
+          <a href={DATA_REPO} target="_blank" rel="noopener noreferrer" style={{ color: "var(--story-text)", textDecoration: "underline", textUnderlineOffset: "3px" }}>
+            The collection and analysis pipeline is open-source on GitHub.
+          </a>{" "}
+          Scraping logic, normalisation, and the full comment corpus are all in there.
+        </Text>
+      </Box>
     </Box>
   );
 }
