@@ -66,7 +66,7 @@ export default function SalaryByYear({ records, hasActiveFilters }: Props) {
       </HStack>
 
       <ResponsiveContainer width="100%" height={340}>
-        <LineChart data={series} margin={{ top: 24, right: 54, left: 4, bottom: 12 }}>
+        <LineChart data={series} margin={{ top: 24, right: 96, left: 4, bottom: 12 }}>
           <CartesianGrid strokeDasharray="3 6" stroke="rgba(67,61,75,0.5)" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: "#a9a1ad", fontSize: 11 }} axisLine={false} tickLine={false} />
           <YAxis tickFormatter={(value) => fmtK(Number(value))} tick={{ fill: "#a9a1ad", fontSize: 11 }} axisLine={false} tickLine={false} width={62} />

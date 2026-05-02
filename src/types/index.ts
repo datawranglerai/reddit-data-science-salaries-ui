@@ -147,3 +147,15 @@ export interface IndustryNarrativeRow {
   values: Record<string, number | null>;
   totalCount: number;
 }
+
+export interface WhoLeaf {
+  name: string;
+  count: number;
+  medianSalary: number | null;
+}
+
+export interface WhoNode {
+  industry: string;
+  totalCount: number;
+  stages: WhoLeaf[];
+}

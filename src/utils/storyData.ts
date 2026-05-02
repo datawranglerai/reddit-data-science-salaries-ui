@@ -10,6 +10,7 @@ import type {
   SourceContextRecord,
   StageNarrativePoint,
   StorySummary,
+  WhoNode,
   YearNarrativePoint,
 } from "../types";
 import { extractYear, fmtK, getCareerStage, getRoleType, median, normalizeRemote, percentile, toUSD } from "./dataUtils";
@@ -221,6 +222,40 @@ export function getIndustryNarrative(records: ProcessedRecord[]): IndustryNarrat
       totalCount: records.filter((record) => record.company_industry === industry).length,
     };
   });
+}
+
+export function getWhoNarrative(records: ProcessedRecord[]): WhoNode[] {
+  const SHOW_MIN = 1;
+  const SALARY_MIN = 3;
+  const TOP_INDUSTRIES = 8;
+
+  const industryCounts = new Map<string, number>();
+  for (const record of records) {
+    if (!record.company_industry) continue;
+    industryCounts.set(record.company_industry, (industryCounts.get(record.company_industry) ?? 0) + 1);
+  }
+
+  const topIndustries = [...industryCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, TOP_INDUSTRIES)
+    .map(([name]) => name);
+
+  return topIndustries
+    .map((industry) => {
+      const industryRecs = records.filter((r) => r.company_industry === industry);
+      const stages = STAGE_ORDER.map((stage) => {
+        const stageRecs = industryRecs.filter((r) => r.careerStage === stage);
+        const salaries = validNumbers(stageRecs.map((r) => r.usdSalary));
+        return {
+          name: stage,
+          count: stageRecs.length,
+          medianSalary: salaries.length >= SALARY_MIN ? Math.round(median(salaries)) : null,
+        };
+      }).filter((s) => s.count >= SHOW_MIN);
+
+      return { industry, totalCount: industryRecs.length, stages };
+    })
+    .filter((node) => node.stages.length > 0);
 }
 
 export function getSupportFacts(records: ProcessedRecord[]): Array<{ label: string; value: string; note: string }> {

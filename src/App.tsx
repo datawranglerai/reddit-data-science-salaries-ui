@@ -23,6 +23,7 @@ import SalaryByStage from "./components/charts/SalaryByStage";
 import IndustryHeatmap from "./components/charts/IndustryHeatmap";
 import RemoteGap from "./components/charts/RemoteGap";
 import DataTable from "./components/DataTable";
+import WhoTreemap from "./components/charts/WhoTreemap";
 import HeroClaim from "./components/story/HeroClaim";
 import MethodologyBlock from "./components/story/MethodologyBlock";
 import SectionHeader from "./components/story/SectionHeader";
@@ -121,6 +122,17 @@ export default function App() {
           onChange={setFilters}
           onReset={() => setFilters(DEFAULT_FILTERS)}
         />
+
+        <Box display="flex" flexDirection="column" gap="6">
+          <SectionHeader
+            eyebrow="The room"
+            title="Here's who put their numbers in."
+            description="Before the pay analysis: this is the shape of the dataset. The people who self-reported, which industries they work in, and how senior they are. Everything downstream is a read of this room — knowing its composition helps judge how far the conclusions travel."
+          />
+          <WhoTreemap records={filteredRecords} />
+        </Box>
+
+        <Box className="story-divider" />
 
         <Box display="flex" flexDirection="column" gap="6">
           <SectionHeader
