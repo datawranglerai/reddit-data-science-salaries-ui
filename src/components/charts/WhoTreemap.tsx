@@ -44,7 +44,7 @@ export default function WhoTreemap({ records }: Props) {
     };
   }, [data]);
 
-  const totalCount = useMemo(() => data.reduce((sum, node) => sum + node.totalCount, 0), [data]);
+  const totalCount = records.length;
 
   if (!data.length) {
     return (

@@ -225,7 +225,8 @@ export function getIndustryNarrative(records: ProcessedRecord[]): IndustryNarrat
 }
 
 export function getWhoNarrative(records: ProcessedRecord[]): WhoNode[] {
-  const LEAF_MIN = 3;
+  const SHOW_MIN = 1;
+  const SALARY_MIN = 3;
   const TOP_INDUSTRIES = 8;
 
   const industryCounts = new Map<string, number>();
@@ -248,9 +249,9 @@ export function getWhoNarrative(records: ProcessedRecord[]): WhoNode[] {
         return {
           name: stage,
           count: stageRecs.length,
-          medianSalary: salaries.length >= LEAF_MIN ? Math.round(median(salaries)) : null,
+          medianSalary: salaries.length >= SALARY_MIN ? Math.round(median(salaries)) : null,
         };
-      }).filter((s) => s.count >= LEAF_MIN);
+      }).filter((s) => s.count >= SHOW_MIN);
 
       return { industry, totalCount: industryRecs.length, stages };
     })
