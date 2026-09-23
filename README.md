@@ -1,6 +1,6 @@
 # Salary, allegedly.
 
-**Nice salary. Wrong comparison.** An interactive editorial feature about six years of r/datascience salary threads, built with React, TypeScript, and Vite.
+**Nice salary. Wrong context.** An interactive editorial feature about six years of r/datascience salary threads, built with React, TypeScript, and Vite.
 
 The story asks why online salary comparisons can mislead:
 

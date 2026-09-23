@@ -1,9 +1,10 @@
 # Editorial feature verification
 
-Verified 2026-09-23 against the bundled v3 dataset.
+Verified 2026-09-24 against the bundled v3 dataset.
 
 - `npm run verify`: passes ESLint, all 11 analytical tests, TypeScript, and the production build.
-- `scripts/editorial-browser-check.cjs`: all 31 assertions pass in local Chromium. Covers chart controls, country and role cohorts, small-sample suppression, salary comparisons, filtering and pagination, sorting semantics, keyboard source inspection, Reddit source links, and the contents of the downloaded filtered CSV.
+- `scripts/editorial-browser-check.cjs`: all 35 assertions pass in local Chromium. Covers chart controls, country and role cohorts, small-sample suppression, salary comparisons, filtering and pagination, sorting semantics, keyboard source inspection, Reddit source links, and the contents of the downloaded filtered CSV.
+- Figure 1 regression checks cover all four measure/location combinations: the line stays at the exact median, colours match actual pay, all reported dots remain visible, and dots neither cross the median nor overlap. The check reproduced the original bug before the fix.
 - Empty cohorts offer a working reset; unknown work arrangement is selectable separately from on-site.
 - No page-wide horizontal overflow at 375, 390, 768, 1024, or 1440px. Tables scroll within their own region.
 - Reduced-motion preference disables smooth scrolling. No browser runtime errors observed.

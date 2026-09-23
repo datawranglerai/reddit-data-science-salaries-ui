@@ -1,6 +1,6 @@
 # Data findings and editorial audit
 
-This note records the evidence behind **“Nice salary. Wrong comparison.”** Every figure below comes from the same implemented functions used by the interface: `prepareEditorialRecords()`, `summarize()`, `yearlySummary()`, `pairedRecords()`, `compensationSummary()`, and `getRoleType()`.
+This note records the evidence behind **“Nice salary. Wrong context.”** Every figure below comes from the same implemented functions used by the interface: `prepareEditorialRecords()`, `summarize()`, `yearlySummary()`, `pairedRecords()`, `compensationSummary()`, and `getRoleType()`.
 
 ## Reproduction
 

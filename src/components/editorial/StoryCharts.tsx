@@ -11,19 +11,37 @@ export function Distribution({ records }: { records: EditorialRecord[] }) {
   const [scope, setScope] = useState('all');
   const cohort = records.filter((r) => scope === 'all' || r.country === 'United States');
   const stats = summarize(cohort, metric);
-  const bins = Array.from({ length: 46 }, () => [] as EditorialRecord[]);
-  cohort.forEach((r) => { if (validPay(r[metric])) bins[Math.min(45, Math.floor(r[metric]! / 10000))].push(r); });
-  const peak = Math.max(...bins.map((bin) => Math.ceil(bin.length / 2)), 1);
+  const binRecords = new Map<number, EditorialRecord[]>();
+  // Make the exact median a bin boundary, including when it falls between $10k ticks.
+  for (const record of cohort) {
+    const value = record[metric];
+    if (!validPay(value)) continue;
+    const start = value >= 450000 ? 450000 : stats.median! + Math.floor((value - stats.median!) / 10000) * 10000;
+    const bin = binRecords.get(start) ?? [];
+    bin.push(record);
+    binRecords.set(start, bin);
+  }
+  const bins = [...binRecords.entries()].sort(([a], [b]) => a - b).map(([start, records]) => {
+    const lower = Math.max(0, start);
+    const upper = Math.min(start + 10000, 450000);
+    return {
+      records,
+      // Narrow edge bins and the overflow bin get one column to avoid collisions.
+      columns: start === 450000 || upper - lower < 10000 ? 1 : 2,
+      center: start === 450000 ? 455000 : (lower + upper) / 2,
+    };
+  });
+  const peak = Math.max(...bins.map((bin) => Math.ceil(bin.records.length / bin.columns)), 1);
   const dotStep = Math.min(7, 168 / peak);
-  const x = (amount: number) => 20 + Math.min(amount, 450000) / 450000 * 610;
-  const overflow = bins[45].length;
+  const x = (amount: number) => 20 + amount / 450000 * 610;
+  const overflow = binRecords.get(450000)?.length ?? 0;
   return <figure className="distribution">
     <div className="figure-heading"><span className="eyebrow">Every dot is a disclosure</span><span className="figure-index">FIG. 01</span></div>
     <div className="distribution-controls"><Segments label="Distribution pay measure" value={metric} options={[{ value: 'usdSalary', label: 'Base pay' }, { value: 'usdTotalComp', label: 'Total comp' }]} onChange={setMetric} /><Segments label="Distribution location" value={scope} options={[{ value: 'all', label: 'All locations' }, { value: 'us', label: 'U.S. only' }]} onChange={setScope} /></div>
     <div className="distribution-stat" aria-live="polite"><strong>{money(stats.median)}</strong><span>median {metric === 'usdSalary' ? 'base salary' : 'total compensation'}<br /><b>{stats.n} usable reports · 2020–2025</b></span></div>
-    <svg className="distribution-svg" viewBox="0 0 660 250" role="img" aria-label={`${stats.n} ${metric === 'usdSalary' ? 'base salaries' : 'total compensation reports'}. Median ${money(stats.median)}. The middle 80 percent spans ${money(stats.p10)} to ${money(stats.p90)}. Last bin contains values at or above $450,000.`}>
+    <svg className="distribution-svg" viewBox="0 0 660 250" role="img" aria-label={`${stats.n} ${metric === 'usdSalary' ? 'base salaries' : 'total compensation reports'}. Median ${money(stats.median)}. The middle 80 percent spans ${money(stats.p10)} to ${money(stats.p90)}. $10,000 bins are aligned to the median, with narrower edge bins. Last bin contains values at or above $450,000.`}>
       {[0, 100000, 200000, 300000, 450000].map((tick) => <g key={tick}><line x1={x(tick)} x2={x(tick)} y1="18" y2="213" className="chart-grid" /><text x={x(tick)} y="238" textAnchor={tick === 0 ? 'start' : tick === 450000 ? 'end' : 'middle'} className="axis-label">{tick === 450000 ? '$450k+' : money(tick)}</text></g>)}
-      {bins.map((bin, i) => bin.map((r, j) => <circle key={r.id} cx={20 + i / 45 * 610 + (j % 2 ? 3 : -3)} cy={207 - Math.floor(j / 2) * dotStep} r={Math.min(2.6, dotStep / 2.3)} className={r[metric]! >= stats.median! ? 'salary-dot upper' : 'salary-dot'}><title>{r.title || 'Title not stated'} · {r.country || 'Location not stated'} · {r.year} · {money(r[metric], true)}</title></circle>))}
+      {bins.map((bin) => bin.records.map((r, j) => <circle key={r.id} cx={x(bin.center) + (bin.columns === 2 ? (j % 2 ? 3 : -3) : 0)} cy={207 - Math.floor(j / bin.columns) * dotStep} r={Math.min(2.6, dotStep / 2.3)} className={r[metric]! >= stats.median! ? 'salary-dot upper' : 'salary-dot'}><title>{r.title || 'Title not stated'} · {r.country || 'Location not stated'} · {r.year} · {money(r[metric], true)}</title></circle>))}
       <line x1={x(stats.median!)} x2={x(stats.median!)} y1="12" y2="215" className="median-line" />
       <text x={x(stats.median!) + 9} y="23" className="median-label">THE MIDDLE</text>
     </svg>

@@ -45,8 +45,8 @@ export default function App() {
       <section className="hero page-width" aria-labelledby="headline">
         <div className="hero-copy">
           <div className="hero-kicker"><span className="reddit-marker">r/</span><span>DATASCIENCE, WITH THE RECEIPTS</span></div>
-          <h1 id="headline">Nice salary.<br /><em>Wrong</em><br /><em>comparison.</em></h1>
-          <p className="hero-deck">Six years of Reddit salary threads. A lot of big numbers. And a few very good reasons to stop comparing yourself to strangers.</p>
+          <h1 id="headline">Nice salary.<br /><em>Wrong</em><br /><em>context.</em></h1>
+          <p className="hero-deck">Six years of Reddit salary threads, and why someone else’s number isn’t necessarily your benchmark.</p>
           <div className="hero-actions"><a className="button button-primary" href="#geography">Follow the money <LuArrowDownRight aria-hidden="true" /></a><a className="text-link" href="#explore">Find your people <LuArrowUpRight aria-hidden="true" /></a></div>
           <p className="hero-disclaimer">Self-reported. Self-selected. Surprisingly revealing.</p>
         </div>
