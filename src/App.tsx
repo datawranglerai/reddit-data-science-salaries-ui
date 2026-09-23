@@ -16,6 +16,7 @@ const TREND = yearlySummary(RECORDS);
 const DIP = Math.round((1 - TREND[4].median! / TREND[3].median!) * 100);
 const QUOTE = RECORDS.find((r) => r.id === 274)!;
 const QUOTE_SOURCE = sourceLink(QUOTE);
+const BRAND_MARK_URL = `${import.meta.env.BASE_URL}brand/salary-smirk.png`;
 const CHAPTERS = [
   { id: 'geography', number: '01', label: 'The comparison trap' },
   { id: 'compensation', number: '02', label: 'Beyond the salary' },
@@ -36,7 +37,7 @@ export default function App() {
   return <>
     <a className="skip-link" href="#main">Skip to the story</a>
     <header className="masthead page-width">
-      <a className="wordmark" href="#" aria-label="Salary, allegedly. Back to top"><span className="brand-mark" aria-hidden="true">✳</span> salary, <em>allegedly.</em></a>
+      <a className="wordmark" href="#" aria-label="Salary, allegedly. Back to top"><img className="brand-mark" src={BRAND_MARK_URL} alt="" width="68" height="68" /> salary, <em>allegedly.</em></a>
       <span className="masthead-edition">A FIELD GUIDE TO GETTING PAID</span>
       <a className="masthead-link" href="#explore">Explore the data <LuArrowUpRight aria-hidden="true" /></a>
     </header>
@@ -91,6 +92,6 @@ export default function App() {
         </div>
       </section>
     </main>
-    <footer className="footer page-width"><a className="wordmark" href="#"><span className="brand-mark" aria-hidden="true">✳</span> salary, <em>allegedly.</em></a><p>Read the numbers. Question the comparison.</p><div><a href="https://buymeacoffee.com/datawranglerai" target="_blank" rel="noreferrer">Buy the author a coffee ↗</a><a href="#">Back to top ↑</a></div></footer>
+    <footer className="footer page-width"><a className="wordmark" href="#"><img className="brand-mark" src={BRAND_MARK_URL} alt="" width="68" height="68" /> salary, <em>allegedly.</em></a><p>Read the numbers. Question the comparison.</p><div><a href="https://buymeacoffee.com/datawranglerai" target="_blank" rel="noreferrer">Buy the author a coffee ↗</a><a href="#">Back to top ↑</a></div></footer>
   </>;
 }

@@ -49,7 +49,7 @@ svg { display: block; }
 .skip-link:focus { top: 16px; }
 .masthead { height: 94px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ink); }
 .wordmark { display: inline-flex; align-items: center; gap: 5px; font: 25px/1 var(--serif); letter-spacing: -1px; text-decoration: none; white-space: nowrap; }
-.brand-mark { font-family: Arial, sans-serif; font-size: 35px; line-height: 1; color: var(--accent); margin-right: 7px; }
+.brand-mark { display: block; flex-shrink: 0; width: 68px; height: 68px; object-fit: contain; margin-right: 7px; }
 .wordmark em { font-weight: 400; }
 .masthead-edition { font: 9px var(--mono); color: var(--muted); letter-spacing: .12em; }
 .masthead-link { display: flex; align-items: center; gap: 22px; font-size: 12px; text-decoration: none; }
@@ -243,7 +243,7 @@ h1 em { color: var(--accent); font-weight: 400; }
 .method-details p { color: #606658; font-size: 12px; line-height: 1.9; margin-top: 13px; }
 .footer { border-top: 1px solid var(--ink); padding-block: 30px 37px; display: flex; justify-content: space-between; align-items: center; gap: 28px; }
 .footer .wordmark { font-size: 21px; }
-.footer .brand-mark { font-size: 29px; }
+.footer .brand-mark { width: 56px; height: 56px; }
 .footer > p { font-size: 10px; color: var(--muted); }
 .footer > div { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .footer > div > a { font-size: 9px; text-decoration: none; color: var(--muted); }
@@ -275,6 +275,7 @@ h1 em { color: var(--accent); font-weight: 400; }
   .masthead { height: 77px; }
   .masthead-edition { display: none; }
   .wordmark { font-size: 24px; }
+  .masthead .brand-mark { width: 54px; height: 54px; margin-right: 3px; }
   .masthead-link { font-size: 11px; gap: 8px; }
   .hero { grid-template-columns: 1fr; gap: 44px; padding-top: 39px; padding-bottom: 33px; }
   h1 { font-size: clamp(62px, 11.4vw, 90px); }
@@ -338,7 +339,7 @@ h1 em { color: var(--accent); font-weight: 400; }
 }
 @media (max-width: 420px) {
   .masthead .wordmark { font-size: 20px; }
-  .masthead .brand-mark { font-size: 29px; margin-right: 2px; }
+  .masthead .brand-mark { width: 50px; height: 50px; margin-right: 2px; }
   .masthead-link { font-size: 10px; }
   h1 { font-size: 62px; }
   .hero-actions { gap: 18px; }
