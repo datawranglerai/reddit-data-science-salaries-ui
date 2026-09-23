@@ -1,105 +1,58 @@
-# The Definitive r/datascience Salary Guide
+# Salary, allegedly.
 
-A single-page data-visualisation dashboard built with Bolt, React, TypeScript, Vite, Chakra UI, and Recharts.
+**Nice salary. Wrong comparison.** An interactive editorial feature about six years of r/datascience salary threads, built with React, TypeScript, and Vite.
 
-The app turns community-reported salary survey data from `r/datascience` into a dark-themed interactive dashboard with:
+The story asks why online salary comparisons can mislead:
 
-- filterable KPI cards
-- salary trend and comparison charts
-- an industry/career-stage heatmap
-- a career-stage spread chart
-- a paginated/exportable data table
+- **Location:** a U.S. median base of $130k versus approximately $76k in the UK, across pooled reports. A role filter lets readers narrow the comparison.
+- **Compensation:** among paired U.S. reports with $300k+ total compensation, the median non-base share is 44.8%, compared with 8.0% below $200k.
+- **Participation:** the roughly 6% dip in the all-location base median in 2024 is absent in U.S. reports, whose median stays at $140k. Counts sit alongside the trend.
+- **Your cohort:** filter, compare an annual salary, inspect original comments, sort and paginate the records, and export the selected rows.
 
-## Project structure
+These are descriptions of voluntary Reddit disclosures, not market estimates or causal conclusions.
 
-- `src/App.tsx` – page layout and filter wiring
-- `src/components/charts/*` – chart components
-- `src/components/FilterBar.tsx` – top-level filters
-- `src/components/KPICards.tsx` – headline metrics
-- `src/components/DataTable.tsx` – sortable, paginated table + CSV export
-- `src/utils/dataUtils.ts` – salary normalization, career-stage mapping, role bucketing, filtering
-- `src/data/v2/processed_salary_data_v3.json` – processed 2020–2025 dataset currently rendered by the UI
-- `src/data/v2/processed_salary_data_v3.csv` – tabular source for the rendered v3 JSON
-- `src/data/original_salary_data.json` and `src/data/processed_salary_data_v2.json` – legacy source artifacts retained for comparison
-- `screenshots/` – visual reference screenshots for manual QA
+## Run
 
-## Running locally
-
-### Prerequisites
-
-- Node.js 22 LTS recommended (or another currently supported version such as Node 24+)
-- npm
-
-> Note: some dependencies emit engine warnings on Node 23.x, so Node 22 LTS is the safest choice for local work.
-
-### Install dependencies
-
-```bash
+```sh
 npm ci
-```
-
-### Start the development server
-
-```bash
 npm run dev
 ```
 
-Vite will print a local URL (typically `http://localhost:5173`).
+## Verify
 
-If you want the dev server accessible from other devices on your network:
-
-```bash
-npm run dev -- --host
-```
-
-### Build a production bundle
-
-```bash
-npm run build
-```
-
-### Preview the production build locally
-
-```bash
-npm run preview
-```
-
-## Testing / verification locally
-
-There is currently **no dedicated unit/integration test suite** in this repository.
-
-For local verification, use the quality checks below:
-
-```bash
-npm run lint
-npm run typecheck
-npm run build
-```
-
-Or run the full validation sequence in one command:
-
-```bash
+```sh
 npm run verify
 ```
 
-### Suggested manual smoke test
+This runs ESLint, 11 analytical tests, TypeScript, and a production build. The analytical tests use Node's native TypeScript stripping; they were run here with Node 23.4.0. Run them separately with `npm test`.
 
-After starting the app locally, check that:
+The optional browser smoke script requires a separately installed Playwright and Chromium, plus a running local server:
 
-1. the filter pills update the KPI cards, charts, and table together
-2. the **Remote Only** toggle changes the dataset as expected
-3. the CSV export button downloads salary rows
-4. the page still matches the general visual direction shown in `screenshots/`
+```sh
+node scripts/editorial-browser-check.cjs
+```
 
-## Visual references
+If Playwright or Chromium lives outside this project, set `PLAYWRIGHT_MODULE_PATH` to the Playwright module directory and `BROWSER_EXECUTABLE` to the browser binary. `PREVIEW_URL` defaults to `http://127.0.0.1:5173/`. The script checks the chart controls, filters, sparse/empty cohorts, sorting, pagination, source inspection, CSV downloads, reduced motion, and viewport widths from 375 to 1440px. It writes screenshots under `screenshots/editorial/`. No browser-testing dependency was added to the app.
 
-The `screenshots/` folder contains current snapshots of the dashboard. Use them as a manual regression reference when changing layout, spacing, colors, chart legibility, or table styling.
+## Project map
 
-## Data notes
+- `DESIGN.md`: active editorial, interaction, accessibility, and responsive contract.
+- `src/App.tsx`: authored story, chapter navigation, source quote, and methodology.
+- `src/components/editorial/StoryCharts.tsx`: dot distribution, country ranges, compensation bands, and trend/sample figures.
+- `src/components/editorial/Explorer.tsx`: filters, histogram, salary comparison, and source-record table.
+- `src/styles/global.css` and `src/components/editorial/explorer.css`: the visual system.
+- `src/utils/editorialData.ts`: explicit audit exclusions, analytical cohorts, safe source links, and CSV serialization.
+- `src/utils/dataUtils.ts`: existing fixed FX, title/stage grouping, medians, and quantiles.
+- `scripts/editorial-data.test.mjs`: regression checks for the data claims and core explorer behavior.
+- `docs/data-findings.md`: evidence, exact cohorts, and parsing limitations.
+- `src/data/v2/processed_salary_data_v3.json`: unchanged runtime source dataset; its CSV companion and earlier dataset versions are retained.
 
-- The runtime UI reads from `src/data/v2/processed_salary_data_v3.json`
-- The refreshed dataset spans the 2020–2025 r/datascience end-of-year salary sharing threads, including the 2025 thread.
-- `src/utils/dataUtils.ts` applies the shared normalization and filtering logic used across the dashboard
-- USD normalization uses the fixed FX table in `src/utils/dataUtils.ts`; unsupported currencies are retained as rows but excluded from USD salary medians.
-- The 2025 slice is the smallest year in the current dataset, so narrative copy treats the latest jump as directional rather than definitive.
-- Legacy data files remain in `src/data/` for comparison; future data-refresh work should update the v3 JSON/CSV pair or add the next version under `src/data/v2/`.
+The previous chart and Chakra component files remain in the repository but are not part of the rendered feature. The new page uses semantic HTML and bespoke SVG charts; unused UI libraries are not loaded into the page.
+
+## Data handling
+
+All 673 source records remain inspectable. Ten manually reviewed non-annual or currency-ambiguous records are excluded from annual-pay calculations. Positive amounts need a supported currency; totals below a usable base are excluded from total compensation while retaining base. This leaves 536 usable base salaries and 429 usable totals. The source files are not edited.
+
+The project uses approximate fixed USD conversion rates, not year-specific FX, and makes no adjustment for inflation, taxes, or living costs. Compensation-share comparisons require base and total from the same record. Missing work arrangement is distinct from on-site. Explorer summaries and percentile comparisons are withheld below ten usable values. Role and career-stage labels are inferred, and other LLM extraction errors can remain.
+
+The JSON includes original comment text for inspection, so the production JavaScript bundle is approximately 1.3 MB uncompressed / 262 kB gzip and triggers Vite's size advisory. All figures remain available without a live data service. The optional web font falls back to local system fonts if offline.
