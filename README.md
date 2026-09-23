@@ -18,6 +18,25 @@ npm ci
 npm run dev
 ```
 
+## Deploy to GitHub Pages
+
+[Deploy to GitHub Pages](.github/workflows/deploy-pages.yml) automatically publishes every push to `main`, including merged pull requests. It uses Node.js 24, installs from the lockfile with `npm ci`, runs all checks in `npm run verify`, and publishes `dist` only after they pass. Failed checks leave the previous deployment in place. A manual run is also available in the repository's **Actions** tab; only the `main` branch can deploy.
+
+The site URL is **https://datawranglerai.github.io/reddit-data-science-salaries-ui/**.
+
+This repository's Pages publishing source is already set to **GitHub Actions**. Once the workflow is committed and pushed to `main`, its first deployment will run automatically. No custom token or additional repository secrets are required: the workflow uses GitHub's built-in token and Pages deployment permissions.
+
+The Pages configuration supplies `PAGES_BASE_PATH` at build time so scripts, styles, and the favicon load under the repository subpath. Local development and other hosts continue to use `/` by default. For a local production preview matching the Pages URL:
+
+```sh
+PAGES_BASE_PATH=/reddit-data-science-salaries-ui/ npm run build
+PAGES_BASE_PATH=/reddit-data-science-salaries-ui/ npm run preview -- --host 127.0.0.1
+```
+
+Open `http://127.0.0.1:4173/reddit-data-science-salaries-ui/`.
+
+For a fork, select **Settings → Pages → Build and deployment → Source → GitHub Actions** once. The workflow reads that repository's Pages path automatically. Deployment follows the [official Vite Pages guidance](https://vite.dev/guide/static-deploy.html#github-pages) and [GitHub's custom Pages workflow requirements](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+
 ## Verify
 
 ```sh
