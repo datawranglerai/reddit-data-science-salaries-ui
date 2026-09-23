@@ -8,8 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b",
-    "verify": "npm run lint && npm run typecheck && npm run build",
-    "preview": "vite preview"
+    "verify": "npm run lint && npm test && npm run typecheck && npm run build",
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.34.0",
