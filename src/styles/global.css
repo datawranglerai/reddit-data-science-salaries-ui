@@ -119,6 +119,21 @@ dl {
   padding: 18px 0 14px;
 }
 
+.page-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-mark {
+  display: block;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
 .about {
   padding-top: 64px;
 }
@@ -171,13 +186,40 @@ dl {
 }
 
 .site-footer {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  gap: 12px;
   margin-top: 54px;
   padding: 22px 0 30px;
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: 14px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-block: 5px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.support-link:hover {
+  color: var(--accent);
+}
+
+.logo-credit {
+  max-width: 80ch;
 }
 
 @media (max-width: 640px) {
@@ -204,6 +246,15 @@ dl {
 
   .page-intro h1 {
     font-size: 40px;
+  }
+
+  .page-brand {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
   }
 
   .page-intro p {

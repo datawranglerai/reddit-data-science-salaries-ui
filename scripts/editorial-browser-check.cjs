@@ -429,6 +429,13 @@ async function verifyApp(page, outputDirectory) {
   }
   const browser = await chromium.launch({ headless: true, ...(process.env.BROWSER_EXECUTABLE ? { executablePath: process.env.BROWSER_EXECUTABLE } : {}) });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  // Functional QA must not depend on the analytics CDN or create live statistics.
+  // The separate analytics harness verifies event delivery with an intercepted SDK.
+  await page.route('https://gc.zgo.at/count.js', (route) => route.fulfill({
+    contentType: 'application/javascript',
+    body: 'window.goatcounter = { count: function () {} };',
+  }));
+  await page.route('https://stats.salaryallegedly.com/**', (route) => route.fulfill({ status: 204, body: '' }));
   const runtimeErrors = [];
   page.on('pageerror', (error) => runtimeErrors.push(error.message));
   page.on('console', (message) => {

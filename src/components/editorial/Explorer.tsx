@@ -139,18 +139,18 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         <fieldset className="choice-group metric-choice">
           <legend>Pay measure</legend>
           <label>
-            <input type="radio" name="pay-metric" checked={metric === 'usdSalary'} onChange={() => changeMetric('usdSalary')} />
+            <input type="radio" name="pay-metric" data-analytics-event="pay-base" checked={metric === 'usdSalary'} onChange={() => changeMetric('usdSalary')} />
             <span>Base salary</span>
           </label>
           <label>
-            <input type="radio" name="pay-metric" checked={metric === 'usdTotalComp'} onChange={() => changeMetric('usdTotalComp')} />
+            <input type="radio" name="pay-metric" data-analytics-event="pay-total" checked={metric === 'usdTotalComp'} onChange={() => changeMetric('usdTotalComp')} />
             <span>Total compensation</span>
           </label>
         </fieldset>
 
         <label className="primary-country">
           <span>Country</span>
-          <select value={filters.country} onChange={(event) => setFilter('country', event.target.value)}>
+          <select data-analytics-event="filter-country" value={filters.country} onChange={(event) => setFilter('country', event.target.value)}>
             <option value="">All countries</option>
             {countries.map((country) => <option key={country} value={country}>{country}</option>)}
             <option value="Not stated">Not stated</option>
@@ -181,14 +181,14 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         <div className="primary-refinements">
           <label className="filter-field">
             <span>Year</span>
-            <select value={filters.year} onChange={(event) => setFilter('year', event.target.value)}>
+            <select data-analytics-event="filter-year" value={filters.year} onChange={(event) => setFilter('year', event.target.value)}>
               <option value="">All years</option>
               {years.map((year) => <option key={year} value={year}>{year}</option>)}
             </select>
           </label>
           <label className="filter-field">
             <span>Role</span>
-            <select value={filters.role} onChange={(event) => setFilter('role', event.target.value)}>
+            <select data-analytics-event="filter-role" value={filters.role} onChange={(event) => setFilter('role', event.target.value)}>
               <option value="">All roles</option>
               {roles.map((role) => <option key={role} value={role}>{role}</option>)}
             </select>
@@ -196,25 +196,25 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         </div>
 
         <details className="more-filters">
-          <summary>More filters</summary>
+          <summary data-analytics-event="more-filters">More filters</summary>
           <div>
             <label className="filter-field">
               <span>Career stage</span>
-              <select value={filters.stage} onChange={(event) => setFilter('stage', event.target.value)}>
+              <select data-analytics-event="filter-stage" value={filters.stage} onChange={(event) => setFilter('stage', event.target.value)}>
                 <option value="">All stages</option>
                 {stages.map((stage) => <option key={stage} value={stage}>{stage}</option>)}
               </select>
             </label>
             <label className="filter-field">
               <span>Work arrangement</span>
-              <select value={filters.work} onChange={(event) => setFilter('work', event.target.value)}>
+              <select data-analytics-event="filter-work" value={filters.work} onChange={(event) => setFilter('work', event.target.value)}>
                 <option value="">Any arrangement</option>
                 {arrangements.map((arrangement) => <option key={arrangement} value={arrangement}>{arrangement}</option>)}
               </select>
             </label>
             <label className="filter-field search-field">
               <span>Search title, industry, city or education</span>
-              <input type="search" value={filters.search} onChange={(event) => setFilter('search', event.target.value)} placeholder="Try fintech or PhD" />
+              <input type="search" data-analytics-event="filter-search" value={filters.search} onChange={(event) => setFilter('search', event.target.value)} placeholder="Try fintech or PhD" />
             </label>
           </div>
         </details>
@@ -222,12 +222,12 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         <div className="filter-actions">
           <div className="active-filters" aria-label="Active filters">
             {activeFilters.map(([key, value]) => (
-              <button key={key} type="button" onClick={() => setFilter(key, '')} aria-label={`Remove ${FILTER_LABELS[key]} filter: ${value}`}>
+              <button key={key} type="button" data-analytics-event={`remove-${key}`} onClick={() => setFilter(key, '')} aria-label={`Remove ${FILTER_LABELS[key]} filter: ${value}`}>
                 <span>{FILTER_LABELS[key]}: {value}</span><span aria-hidden="true">×</span>
               </button>
             ))}
           </div>
-          <button className="reset-view" type="button" onClick={resetView}>Reset view</button>
+          <button className="reset-view" type="button" data-analytics-event="reset-view" onClick={resetView}>Reset view</button>
         </div>
       </form>
 
@@ -235,7 +235,7 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         <div className="empty-state" role="status">
           <strong>No reports match this selection.</strong>
           <span>Remove a filter or reset the view to continue.</span>
-          <button type="button" onClick={resetView}>Reset view</button>
+          <button type="button" data-analytics-event="reset-view" onClick={resetView}>Reset view</button>
         </div>
       )}
 
@@ -249,7 +249,7 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
             <legend>Break down by</legend>
             {(['country', 'role', 'year'] as SalaryBreakdown[]).map((value) => (
               <label key={value}>
-                <input type="radio" name="breakdown" checked={breakdown === value} onChange={() => changeBreakdown(value)} />
+                <input type="radio" name="breakdown" data-analytics-event={`breakdown-${value}`} checked={breakdown === value} onChange={() => changeBreakdown(value)} />
                 <span>{value[0].toUpperCase() + value.slice(1)}</span>
               </label>
             ))}
@@ -264,13 +264,13 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         />
 
         {breakdown !== 'year' && grouped.groups.length > 8 && (
-          <button className="show-all" type="button" onClick={() => setShowAllGroups((current) => !current)}>
+          <button className="show-all" type="button" data-analytics-event={showAllGroups ? 'groups-show-fewer' : 'groups-show-all'} onClick={() => setShowAllGroups((current) => !current)}>
             {showAllGroups ? 'Show fewer groups' : `Show all ${grouped.groups.length} groups`}
           </button>
         )}
 
         <details className="group-data">
-          <summary>View comparison data</summary>
+          <summary data-analytics-event="comparison-data">View comparison data</summary>
           <div className="table-scroll" role="region" aria-label={`${breakdown} comparison data`} tabIndex={0}>
             <table>
               <thead><tr><th scope="col">{breakdown}</th><th scope="col">Selected</th><th scope="col">Usable</th><th scope="col">Median</th><th scope="col">Middle 50%</th></tr></thead>
@@ -291,10 +291,10 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
       </section>
 
       <details className="salary-position">
-        <summary>Compare a salary with these reports</summary>
+        <summary data-analytics-event="salary-position">Compare a salary with these reports</summary>
         <div>
           <label htmlFor="salary-comparison">Annual {metricLabel} in USD</label>
-          <span className="salary-input"><span aria-hidden="true">$</span><input id="salary-comparison" type="number" min="1" step="1000" inputMode="numeric" value={comparison} onChange={(event) => setComparison(event.target.value)} placeholder="125000" /></span>
+          <span className="salary-input"><span aria-hidden="true">$</span><input id="salary-comparison" type="number" data-analytics-event="salary-input" min="1" step="1000" inputMode="numeric" value={comparison} onChange={(event) => setComparison(event.target.value)} placeholder="125000" /></span>
           <div aria-live="polite">
             {!comparison ? <p>Enter a positive amount.</p> : distribution.usableCount < MIN_COHORT ? (
               <p>Position withheld: this selection needs at least {MIN_COHORT} usable reports.</p>
@@ -309,18 +309,18 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
       <section id="reports" className="reports-section" aria-labelledby="reports-title">
         <div className="section-heading reports-heading">
           <div><h2 id="reports-title">Reports</h2><p>{cohort.length.toLocaleString()} selected source {cohort.length === 1 ? 'record' : 'records'}</p></div>
-          <button type="button" onClick={downloadCSV}>Download filtered CSV</button>
+          <button type="button" data-analytics-event="export-csv" onClick={downloadCSV}>Download filtered CSV</button>
         </div>
 
         <div className="table-scroll reports-table-scroll" role="region" aria-label="Selected salary reports" tabIndex={0}>
           <table className="reports-table">
             <thead>
               <tr>
-                <th scope="col" aria-sort={sort.key === 'title' ? sort.direction : 'none'}><button type="button" onClick={() => changeSort('title')}>Title <span aria-hidden="true">{sort.key === 'title' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
-                <th scope="col" aria-sort={sort.key === 'year' ? sort.direction : 'none'}><button type="button" onClick={() => changeSort('year')}>Year <span aria-hidden="true">{sort.key === 'year' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
+                <th scope="col" aria-sort={sort.key === 'title' ? sort.direction : 'none'}><button type="button" data-analytics-event="sort-title" onClick={() => changeSort('title')}>Title <span aria-hidden="true">{sort.key === 'title' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
+                <th scope="col" aria-sort={sort.key === 'year' ? sort.direction : 'none'}><button type="button" data-analytics-event="sort-year" onClick={() => changeSort('year')}>Year <span aria-hidden="true">{sort.key === 'year' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
                 <th scope="col">Country</th><th scope="col">Stage</th><th scope="col">Work</th>
-                <th scope="col" aria-sort={sort.key === 'usdSalary' ? sort.direction : 'none'}><button type="button" onClick={() => changeSort('usdSalary')}>Base <span aria-hidden="true">{sort.key === 'usdSalary' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
-                <th scope="col" aria-sort={sort.key === 'usdTotalComp' ? sort.direction : 'none'}><button type="button" onClick={() => changeSort('usdTotalComp')}>Total <span aria-hidden="true">{sort.key === 'usdTotalComp' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
+                <th scope="col" aria-sort={sort.key === 'usdSalary' ? sort.direction : 'none'}><button type="button" data-analytics-event="sort-base" onClick={() => changeSort('usdSalary')}>Base <span aria-hidden="true">{sort.key === 'usdSalary' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
+                <th scope="col" aria-sort={sort.key === 'usdTotalComp' ? sort.direction : 'none'}><button type="button" data-analytics-event="sort-total" onClick={() => changeSort('usdTotalComp')}>Total <span aria-hidden="true">{sort.key === 'usdTotalComp' ? (sort.direction === 'ascending' ? '↑' : '↓') : '↕'}</span></button></th>
               </tr>
             </thead>
             <tbody>
@@ -336,7 +336,7 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
                     <tr className="source-row">
                       <td colSpan={7}>
                         <details>
-                          <summary>Inspect source report</summary>
+                          <summary data-analytics-event="source-report">Inspect source report</summary>
                           <div className="source-detail">
                             <div><h3>Original comment</h3><p>{record.original_body?.trim() || 'Original comment text is unavailable in this export.'}</p></div>
                             <dl>
@@ -346,7 +346,7 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
                               <div><dt>Internship</dt><dd>{fieldValue(record.had_internship)}</dd></div><div><dt>Co-op</dt><dd>{fieldValue(record.had_coop)}</dd></div>
                               <div><dt>Review note</dt><dd>{record.qualityNote || 'No manual exclusion flag'}</dd></div>
                             </dl>
-                            {link ? <a href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a> : <p>No verified Reddit link in this record.</p>}
+                            {link ? <a href={link.href} target="_blank" rel="noreferrer" data-analytics-event="source-reddit">{link.label} ↗</a> : <p>No verified Reddit link in this record.</p>}
                           </div>
                         </details>
                       </td>
@@ -360,9 +360,9 @@ export default function Explorer({ records }: { records: EditorialRecord[] }) {
         </div>
 
         <nav className="pagination" aria-label="Salary report pages">
-          <button type="button" onClick={() => setPage(Math.max(0, safePage - 1))} disabled={safePage === 0}>Previous</button>
+          <button type="button" data-analytics-event="page-previous" onClick={() => setPage(Math.max(0, safePage - 1))} disabled={safePage === 0}>Previous</button>
           <span>Page {safePage + 1} of {pageCount}</span>
-          <button type="button" onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))} disabled={safePage === pageCount - 1}>Next</button>
+          <button type="button" data-analytics-event="page-next" onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))} disabled={safePage === pageCount - 1}>Next</button>
         </nav>
       </section>
     </section>

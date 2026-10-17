@@ -44,7 +44,7 @@ Deployment follows the [Vite GitHub Pages guidance](https://vite.dev/guide/stati
 npm run verify
 ```
 
-This runs ESLint, 17 analytical tests, TypeScript, and a production build. Run the analytical tests alone with `npm test`.
+This runs ESLint, the automated tests, TypeScript, and a production build. Run the tests alone with `npm test`.
 
 The optional browser harness requires a separately installed Playwright module and Chromium. Start the Vite development server on the harness's default port:
 
@@ -56,11 +56,24 @@ Then run the harness in another terminal:
 
 ```sh
 node scripts/editorial-browser-check.cjs
+node scripts/analytics-browser-check.cjs
 ```
 
 Set `PLAYWRIGHT_MODULE_PATH` when Playwright is outside this project, `BROWSER_EXECUTABLE` for a specific Chromium binary, or `PREVIEW_URL` for another server URL. The harness covers the actual distribution component fixtures, data and cohort transitions, filtering, sorting, pagination, source inspection, CSV downloads, reduced motion, focus, 200%-equivalent viewport reflow, and viewport widths from 375 to 1440px. It writes timestamped evidence under `.omx/reports/salary-allegedly-implementation/` by default; override that location with `BROWSER_REPORT_DIR`.
 
+The analytics harness uses the same browser settings and an explicit SDK spy to check named events, delayed loading, unavailable analytics, and the responsive support link. It does not contact the live collector. Its screenshots go to `.omx/reports/analytics-support/`; override that location with `ANALYTICS_REPORT_DIR`.
+
 See [docs/verification.md](docs/verification.md) for the current verification status.
+
+## Analytics and support
+
+GoatCounter records page visits through the async script in `index.html`, using `https://stats.salaryallegedly.com/count`. Its standard page-view behavior and metadata are described in the [GoatCounter JavaScript documentation](https://www.goatcounter.com/help/js). The client normally skips localhost traffic.
+
+`src/utils/analytics.ts` records explicitly named controls through `data-analytics-event` attributes. Event paths look like `ui/filter-country/change`, `ui/source-report/open`, and `ui/support-coffee/click`. Clicks, committed field changes, and disclosure open/close actions are distinct event categories. Navigation, filters, chart clicks, comparison controls, sorting, pagination, source inspection, CSV export, data notes, and the support link are covered, including controls rendered after filtering or pagination.
+
+Interaction payloads use fixed names/titles rather than input values, selected options, record IDs, link destinations, or report contents. Search and salary changes are counted on commit, not on every keystroke. A small bounded queue preserves interactions while the async script loads; unavailable analytics does not prevent use of the explorer. Automated browser checks intercept analytics requests so QA does not populate the live dashboard.
+
+The footer's [Buy me a coffee](https://www.buymeacoffee.com/datawranglerai) link uses the site's own styles. It does not load the third-party button script or its font.
 
 ## Project map
 
@@ -71,8 +84,10 @@ See [docs/verification.md](docs/verification.md) for the current verification st
 - `src/styles/global.css` and `src/components/editorial/explorer.css`: visual and responsive styles.
 - `src/utils/editorialData.ts`: reviewed exclusions, metric coverage, distribution bins, grouped summaries, filtering, safe source links, and CSV serialization.
 - `src/utils/dataUtils.ts`: fixed currency conversion, inferred role/stage labels, medians, and quantiles.
+- `src/utils/analytics.ts`: delegated, named interaction events for GoatCounter.
 - `scripts/editorial-data.test.mjs`: analytical and data-behavior regression tests.
 - `scripts/editorial-browser-check.cjs` and `scripts/fixtures/`: browser interaction checks and actual-component renderer fixtures.
+- `scripts/analytics.test.mjs` and `scripts/analytics-browser-check.cjs`: event payload and browser integration checks.
 - `docs/data-findings.md`: historical data audit, exact cohorts, and parsing limitations.
 - `src/data/v2/processed_salary_data_v3.json`: unchanged runtime source dataset; its CSV companion and earlier versions remain in the repository.
 

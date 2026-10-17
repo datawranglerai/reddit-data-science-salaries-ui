@@ -43,7 +43,7 @@ export function DistributionChart({ distribution, metricLabel }: DistributionCha
             <span>{distribution.regularPeak}</span><span>Reports</span><span>0</span>
           </div>
           <div className="plot-column">
-            <svg viewBox={`0 0 ${plotWidth} ${plotHeight}`} role="img" aria-label={chartDescription} preserveAspectRatio="none">
+            <svg data-analytics-event="chart-distribution" viewBox={`0 0 ${plotWidth} ${plotHeight}`} role="img" aria-label={chartDescription} preserveAspectRatio="none">
               <line className="plot-baseline" x1="0" y1={plotHeight} x2={plotWidth} y2={plotHeight} />
               {distribution.bins.map((bin, index) => {
                 const height = bin.count / distribution.regularScaleMax * (plotHeight - 4);
@@ -91,7 +91,7 @@ export function DistributionChart({ distribution, metricLabel }: DistributionCha
       </figcaption>
 
       <details className="chart-data">
-        <summary>View chart data</summary>
+        <summary data-analytics-event="distribution-data">View chart data</summary>
         <div className="chart-data-scroll">
           <table>
             <caption>Counts for the {metricLabel} distribution</caption>
@@ -128,7 +128,7 @@ export function ComparisonChart({ groups, metricLabel, dimension, isSingleGroup 
     <figure className="comparison-chart" aria-label={`${label} comparison for selected ${metricLabel} reports`}>
       {isSingleGroup && groups[0] && <figcaption>{groups[0].label} detail</figcaption>}
       <div className="comparison-axis" aria-hidden="true"><span>$0</span><span>{money(scaleMaximum, true)}</span></div>
-      <div className="comparison-rows">
+      <div className="comparison-rows" data-analytics-event={`chart-${dimension}`}>
         {groups.map((group) => (
           <div className="comparison-row" key={group.key}>
             <div className="group-label"><strong>{group.label}</strong><span>{group.usableCount} usable · {group.selectedCount} selected</span></div>

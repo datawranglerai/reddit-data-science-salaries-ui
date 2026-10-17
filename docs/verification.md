@@ -1,10 +1,10 @@
 # Explorer verification
 
-Current status as of 2026-10-16 against the bundled v3 dataset.
+Current status as of 2026-10-17 against the bundled v3 dataset.
 
 ## Completed
 
-- `npm run verify` passes ESLint, all 17 analytical tests, TypeScript, and the production build.
+- `npm run verify` passes ESLint, all 19 tests (17 analytical and 2 analytics), TypeScript, and the production build.
 - The analytical tests cover source-row preservation, reviewed exclusions, missing/invalid pay, work-arrangement states, total-below-base handling, active-metric coverage, composed filters, threshold/tie behavior, fixed histogram edges, count conservation, inclusive tails, grouped summaries, safe source URLs, and CSV quoting/formula neutralization.
 - The actual `DistributionChart` renderer fixtures pass the all-tail, exact-$500,000-median, empty, and ordinary cases. They verify 20 regular bins, finite non-negative SVG geometry, zero-height empty bins, exact in-domain median placement, no clamped off-domain median, and accurate visible/accessible tail text.
 - Browser interaction checks pass for broad base and total coverage, UK and sparse/zero-usable cohorts, shared-filter preservation, country/role/year grouping, salary comparison behavior, empty-state recovery, sorting, pagination reset, source inspection, safe Reddit links, and broad/filtered CSV identities.
@@ -20,6 +20,16 @@ Current status as of 2026-10-16 against the bundled v3 dataset.
 The final generated screenshots are under `.omx/reports/salary-allegedly-implementation/browser-reviewed`; the corresponding logs are `.omx/reports/salary-allegedly-implementation/browser-reviewed.log` and `.omx/reports/salary-allegedly-implementation/verification-reviewed.log`. New runs write timestamped evidence under `.omx/reports/salary-allegedly-implementation/` unless `BROWSER_REPORT_DIR` is set.
 
 This is browser smoke and interaction coverage, not a full assistive-technology or cross-browser accessibility certification.
+
+## Analytics and support
+
+The full explorer harness passes all 126 checks after adding GoatCounter and the footer support link. This run intercepts the tracking script and collector so automated interactions do not appear in live statistics. Its log is `.omx/reports/analytics-editorial.log`, with screenshots in `.omx/reports/analytics-support/editorial/`.
+
+The dedicated analytics harness passes 49 checks using an explicit SDK spy. It covers the script configuration, bounded startup queue, dynamic controls, disclosure timing, separate click/change events, fixed payloads, and continued explorer use when analytics is blocked, missing, or throws. All current interactive controls and charts have registered event keys.
+
+An additional check uses the actual public GoatCounter script with every collector request intercepted. It verifies default localhost skipping, exactly one automatic page view when locally enabled for the test, named interaction events at the configured endpoint, no extra page views for hash navigation, and no entered search or salary values in those requests. Evidence and the script's SHA-256 hash are in `.omx/reports/analytics-support/sdk-smoke.json`. This verifies request generation, not receipt in the live dashboard.
+
+The native Buy me a coffee link uses the supplied `datawranglerai` profile. Footer screenshots at 375, 390, and 1440px show no page-wide overflow and retain the site's typography.
 
 ## Data scope
 

@@ -2,7 +2,7 @@
 
 ## Source of truth
 
-Status: Active. Date: 2026-10-16. Surface: the single-page r/datascience salary explorer. This document describes the implemented exploration design and supersedes the retired narrative chapter structure.
+Status: Active. Date: 2026-10-17. Surface: the single-page r/datascience salary explorer. This document describes the implemented exploration design and supersedes the retired narrative chapter structure.
 
 ## Product goal
 
@@ -15,12 +15,12 @@ The product does not provide salary advice, causal explanations, representative 
 The page has five parts:
 
 1. A compact header with links to Reports and About the data.
-2. The title and factual descriptor: “Salary reports from r/datascience, 2020–2025.”
+2. A small portrait beside the title and factual descriptor: “Salary reports from r/datascience, 2020–2025.”
 3. One explorer containing the distribution, shared filters, grouped comparison, optional salary-position comparison, and source-record table.
 4. Concise data notes covering source, coverage, pay treatment, inferred labels, summary thresholds, and limits.
-5. Source/code and back-to-top links.
+5. Source/code, Buy me a coffee, and back-to-top links, followed by a readable logo-source credit. The support link uses the page's typography and a small coffee icon rather than a floating widget.
 
-There are no authored story chapters, separate editorial cohorts, portrait masthead, or portrait footer. The existing smirk asset remains the favicon.
+There are no authored story chapters or separate editorial cohorts. The existing smirk mark sits beside the title at 56px on desktop and 44px on mobile, with no repeated portrait in the footer. It also remains the favicon. The footer credits Tim Robinson and *I Think You Should Leave*, links Netflix's official guide, and identifies the “You sure about that, that’s why?” reference.
 
 ## Exploration model
 
@@ -68,7 +68,9 @@ At 640px and below, reduce gutters and type, stack the plot tail below the histo
 
 Use React 19, TypeScript, Vite, semantic HTML, and native SVG with installed dependencies. Keep analytical helpers pure and test missing values, threshold boundaries, distribution conservation, filtering, grouping, source links, and CSV safety. Preserve the bundled source datasets and fixed conversion behavior.
 
-Verification includes ESLint, 17 analytical tests, TypeScript, production build, actual-component renderer fixtures, browser interactions, keyboard/focus behavior, responsive viewports, zoom/reflow, reduced motion, screenshots, console output, and source hashes. Record incomplete checks explicitly in `docs/verification.md`.
+GoatCounter supplies page-view analytics. Named interaction events describe controls and actions without embedding field values or report contents. Tracking must not change navigation or control behavior, and the page remains usable when the analytics script is unavailable.
+
+Verification includes ESLint, analytical and analytics tests, TypeScript, production build, actual-component renderer fixtures, browser interactions, keyboard/focus behavior, responsive viewports, zoom/reflow, reduced motion, screenshots, console output, and source hashes. Record incomplete checks explicitly in `docs/verification.md`.
 
 ## Open question
 
