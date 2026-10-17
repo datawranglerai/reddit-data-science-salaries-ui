@@ -1,43 +1,77 @@
 # Design
 
 ## Source of truth
-Status: Active. Date: 2026-09-23. Surface: the single-page r/datascience salary feature. This contract supersedes the legacy visual brief in `.codex/DESIGN.md` for the new feature. Evidence reviewed: README, App, existing chart/story components, global CSS, normalization utilities, v3 JSON/CSV, original comment bodies, and the previous full-page screenshot. The logo uses the user-supplied Tim Robinson still for its expression and the Bao restaurant logo for its graphic style; see `docs/brand-mark.md`. The user's latest request replaces the previous dashboard and weak narrative.
 
-## Brand
-Salary, allegedly. An independent, curious, slightly irreverent data feature. The brand mark is a compact dark-ink portrait with a tilted head and knowing smirk, riffing on the user-provided Tim Robinson still. Its solid hair silhouette, sparse facial contours, and hand-drawn character follow the Bao style reference. Retain the serif wordmark. Warm editorial paper, ink, restrained vermilion, sharp rules. Earn trust with visible cohort sizes, source comments, and reproducible numbers. Avoid neon, gradients, dashboard card grids, empty superlatives, fabricated causal claims, and sarcastic caveats in every paragraph.
+Status: Active. Date: 2026-10-17. Surface: the single-page r/datascience salary explorer. This document describes the implemented exploration design and supersedes the retired narrative chapter structure.
 
-## Product goals
-Help readers understand why Reddit salary comparisons mislead, discover specific evidence, and find relevant disclosures. Success: first screen communicates the premise and shows real data; each chapter has an evidenced point; readers can inspect and export their cohort. Non-goals: market-rate estimates, salary advice, causal inference, a new scraping pipeline, or unsupported claims about AI and layoffs.
+## Product goal
 
-## Personas and jobs
-Curious data professionals reading on a phone; job seekers comparing offers; technically literate readers auditing the story. Read a short feature, compare similar reports, inspect original text, download a filtered slice.
+Make the fixed 2020–2025 Reddit dataset directly explorable. Readers begin with the broad sample, then narrow one shared cohort and inspect the records behind it. The page must preserve the exact title **Salary, Allegedly**, keep source and coverage limits close to the data, and avoid presenting the sample as a market benchmark.
+
+The product does not provide salary advice, causal explanations, representative market estimates, or a new scraping pipeline.
 
 ## Information architecture
-One page: masthead and hook with an interactive salary distribution; sticky chapter navigation; geography; paired base/total compensation; participation over time; local cohort explorer and source records; transparent methodology and source links. Editorial cohorts remain stable. Controls within a figure affect that figure only; explorer controls affect explorer stats, chart, rows, and export together.
 
-## Design principles
-A finding earns its headline. Every statistic names its measure and population. Pacing varies across a large opening plot, country comparisons, a dark compensation chapter, paired trend/count charts, and a practical explorer. Source details are reachable without abandoning the feature. Use original raw records without silently editing them.
+The page has five parts:
+
+1. A compact header with links to Reports and About the data.
+2. A small portrait beside the title and factual descriptor: “Salary reports from r/datascience, 2020–2025.”
+3. One explorer containing the distribution, shared filters, grouped comparison, optional salary-position comparison, and source-record table.
+4. Concise data notes covering source, coverage, pay treatment, inferred labels, summary thresholds, and limits.
+5. Source/code, Buy me a coffee, and back-to-top links, followed by a readable logo-source credit. The support link uses the page's typography and a small coffee icon rather than a floating widget.
+
+There are no authored story chapters or separate editorial cohorts. The existing smirk mark sits beside the title at 56px on desktop and 44px on mobile, with no repeated portrait in the footer. It also remains the favicon. The footer credits Tim Robinson and *I Think You Should Leave*, links Netflix's official guide, and identifies the “You sure about that, that’s why?” reference.
+
+## Exploration model
+
+The default view uses all countries, all years, all roles, base salary, and a country breakdown. Country and pay measure sit beside the opening distribution. Year and role are the primary refinements; career stage, work arrangement, and text search are available under More filters.
+
+All active filters define one cohort. That cohort drives distribution counts, metric coverage, grouped comparisons, salary position, source rows, and CSV export. Changing a filter returns the report table to its first page. Active filters can be removed individually. Reset restores the broad base-salary view, country breakdown, default sort, first page, and an empty salary comparison.
+
+Switching pay measure preserves the cohort and clears the entered salary comparison. Switching the country, role, or year breakdown changes only the grouping of the same filtered cohort.
+
+## Data presentation
+
+The opening distribution shows 20 half-open $25,000 bins from $0 to under $500,000. Values at or above $500,000 appear in a separate inclusive tail with its count and actual maximum. The plot does not clamp an off-domain median to the $500,000 endpoint. Empty and all-tail cohorts keep finite chart geometry and explicit recovery or explanatory text.
+
+Selected count includes every source record in the cohort. Usable count includes only records with a valid value for the active pay measure. For the broad sample, the interface also shows the share of usable values reported from the U.S.
+
+Median and middle-50% summaries require at least 10 usable values. Sparse cohorts and groups retain observed selected/usable counts and source rows while withholding those summaries. Salary position uses the same threshold, counts reports strictly below the entered amount, and is labelled as a position within the self-selected reports rather than a market percentile.
+
+Country and role groups place supported summaries first by median, then sample size and label. Year groups remain chronological. Long country or role results initially show eight groups with an explicit Show all control. A data table provides the complete comparison as a text equivalent.
+
+## Source records
+
+The report table keeps every selected record, including records without usable active pay. It sorts by title, year, base salary, or total compensation and shows eight report rows per page. Each record can reveal its original comment, raw pay fields, extraction fields, review note, and a validated Reddit source link when available.
+
+CSV export uses the same filtered source cohort, preserves missing active pay, quotes fields, and neutralizes spreadsheet-formula prefixes.
 
 ## Visual language
-Paper #f4f1e9, ink #242722, muted #686b62, rule #d3d1c5, vermilion #bb432b, sage #727d62. Serif display (Georgia), sans body (Inter), mono metadata (system monospace). Typography and data marks carry the personality. 4px spacing unit; 24–48px gutters; 80–120px chapter spacing. Square edges, no blur or decorative gradients. Native SVG charts and direct labels. Short state transitions only; respect reduced motion. Charts remain native SVG. The logo is a transparent generated PNG, used at 68px in the masthead, 50–54px on mobile, and 56px in the footer.
 
-## Components
-New editorial components live in `src/components/editorial`; derived evidence in `src/utils/editorialData.ts`; CSS tokens belong to global.css. Native controls, semantic tables, SVG figures, expandable source records, and clear in-context annotations. Existing legacy components remain available but are outside the rendered feature. No competing token layer.
+The interface uses warm paper (`#f6f3eb`), dark ink (`#242722`), muted text (`#656960`), rules (`#d4d0c5`), vermilion (`#b8462f`), and sage (`#77816b`). Georgia is the display face and Inter/system sans serif is the body face. Typography, rules, native controls, and direct data marks provide hierarchy. Surfaces stay square and flat, without gradients, shadows, decorative cards, or a competing token system.
 
-## Accessibility
-Target WCAG 2.2 AA. Skip link, semantic landmarks, heading order, visible focus, native select/input/button controls, labelled SVGs with text equivalents, readable contrasts. All chart state changes use buttons or selects and show their values outside hover. Record inspection works with keyboard and touch. No essential hover-only content. Motion is optional. Large tables may scroll within their labelled region.
+The content width is 1180px with 24px desktop and 16px mobile side gutters. The title remains compact so the primary plot, pay measure, country control, usable count, tail, and local caveat dominate the opening viewport.
 
-## Responsive behavior
-Desktop max-width 1280px with asymmetric columns. Tablet reduces typography and gutters. Below 760px, stack narrative and figures, keep chapter navigation horizontally scrollable, use compact chart labels, and collapse explorer fields into two columns. Mobile 375px minimum acceptance target; no page-wide overflow.
+## Content
 
-## Interaction states
-Every local control shows selected state. Explorer filters update together and reset pagination. Empty cohorts explain how to recover and offer reset. Small samples retain rows but suppress percentile/summary claims below the documented threshold. Missing values stay missing; unknown remote status is distinct. CSV exports the selected records. Static bundled data needs no network loading state; source links require internet.
+Use short, functional labels and factual descriptions. Name the active pay measure and population for each statistic. Use “reports”, “selected”, and “usable” precisely. State that disclosures are self-selected, unverified, and mostly from the U.S.; values use approximate fixed USD rates without inflation, tax, or living-cost adjustments.
 
-## Content voice
-Sharp, precise, human. Premise: “Nice salary. Wrong context.” Subheading: “Six years of Reddit salary threads, and why someone else’s number isn’t necessarily your benchmark.” Explain why country, compensation composition, and participation affect comparison. Use “reported”, “in these threads”, and explicit cohorts where they matter. Never imply representativeness, equal job scope, real-wage growth, or a causal premium. Do not describe missing non-salary compensation as zero. Titles should contain an observation or useful tension.
+Do not imply representativeness, equal job scope, causal differences, or zero non-salary compensation when total is missing. Keep extraction and inferred-label limitations visible in About the data and source inspection.
+
+## Accessibility and responsive behavior
+
+Target WCAG 2.2 AA. Use semantic landmarks and heading order, a skip link, native controls, visible focus, labelled SVGs, live text for state changes, and keyboard-operable disclosures. Essential chart values must also be available as text or tables. Large tables may scroll inside labelled regions; the page itself must not overflow horizontally.
+
+At 640px and below, reduce gutters and type, stack the plot tail below the histogram, stack secondary layouts, and keep essential chart labels at least 12 rendered pixels. The minimum acceptance viewport is 375px. At enlarged text or 200% zoom, controls and evidence must reflow without loss. Reduced-motion preference removes smooth scrolling and nonessential chart motion.
 
 ## Implementation constraints
-React 19, TypeScript, Vite; installed dependencies only. Reuse audited utilities where correct; new analytical functions must be pure and tested for missing values, exclusions, paired cohorts, and filtering. Preserve source datasets unchanged. Use fixed legacy FX rates as approximate nominal conversion and publish them. Verify lint, typecheck, build, analytical assertions, browser interactions, desktop/mobile screenshots, and console output. Any unverified source parsing is disclosed.
 
-## Open questions
-- [ ] Whether to expand the dataset beyond the bundled 2020–2025 threads. Owner: project maintainer. No impact on this implementation.
+Use React 19, TypeScript, Vite, semantic HTML, and native SVG with installed dependencies. Keep analytical helpers pure and test missing values, threshold boundaries, distribution conservation, filtering, grouping, source links, and CSV safety. Preserve the bundled source datasets and fixed conversion behavior.
+
+GoatCounter supplies page-view analytics. Named interaction events describe controls and actions without embedding field values or report contents. Tracking must not change navigation or control behavior, and the page remains usable when the analytics script is unavailable.
+
+Verification includes ESLint, analytical and analytics tests, TypeScript, production build, actual-component renderer fixtures, browser interactions, keyboard/focus behavior, responsive viewports, zoom/reflow, reduced motion, screenshots, console output, and source hashes. Record incomplete checks explicitly in `docs/verification.md`.
+
+## Open question
+
+- Whether to expand the dataset beyond the bundled 2020–2025 threads. This does not affect the current implementation.

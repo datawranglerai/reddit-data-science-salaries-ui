@@ -2,7 +2,9 @@
 
 The current logo concept uses the supplied Tim Robinson / I Think You Should Leave still for the tilted head, raised brows, and knowing closed-mouth smile. The supplied Bao restaurant logo informs the graphic treatment: a solid dark hair silhouette, economical contours, open negative space, and an idiosyncratic hand-drawn character. The Bao character, eating gesture, and food are not used.
 
-Asset: [`public/brand/salary-smirk.png`](../public/brand/salary-smirk.png). Single dark ink on a transparent background. Used in the masthead, footer, and favicon. Vite's base URL keeps the image working under the GitHub Pages repository path. The visible wordmark supplies the accessible name; the adjacent illustration has an empty alt attribute.
+Asset: [`public/brand/salary-smirk.png`](../public/brand/salary-smirk.png). Single dark ink on a transparent background. Displayed beside the page title at 56px on desktop and 44px on mobile, and retained as the favicon. The adjacent title supplies the accessible name, so the decorative portrait has an empty alt attribute. Vite's base URL keeps the image working under the GitHub Pages repository path.
+
+The footer reads: “Logo inspired by Tim Robinson in I Think You Should Leave (Netflix): ‘You sure about that, that’s why?’” The show title links to [Netflix's official sketch guide](https://www.netflix.com/tudum/articles/i-think-you-should-leave-sketch-names), which lists the corresponding season-two episode. This credits the screen reference for the illustration.
 
 Created with the built-in image-generation tool using the two user-supplied references. The original photos were not edited. The earlier Kevin James concept remains at `public/brand/salary-shrug.png` for comparison but is no longer rendered.
 

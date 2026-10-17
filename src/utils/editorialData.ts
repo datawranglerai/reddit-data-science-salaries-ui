@@ -69,6 +69,173 @@ export function summarize(records: EditorialRecord[], metric: PayMetric = 'usdSa
   };
 }
 
+export interface MetricCoverage {
+  selectedCount: number;
+  usableCount: number;
+  usUsableCount: number;
+  usUsableShare: number | null;
+}
+
+export function metricCoverage(records: EditorialRecord[], metric: PayMetric = 'usdSalary'): MetricCoverage {
+  const usable = records.filter((record) => validPay(record[metric]));
+  const usUsableCount = usable.filter((record) => record.country === 'United States').length;
+  return {
+    selectedCount: records.length,
+    usableCount: usable.length,
+    usUsableCount,
+    usUsableShare: usable.length ? usUsableCount / usable.length : null,
+  };
+}
+
+export const DISTRIBUTION_BIN_WIDTH = 25_000;
+export const DISTRIBUTION_LIMIT = 500_000;
+export const DISTRIBUTION_BIN_COUNT = DISTRIBUTION_LIMIT / DISTRIBUTION_BIN_WIDTH;
+
+export interface SupportedSalarySummary {
+  median: number;
+  p25: number;
+  p75: number;
+}
+
+export interface SalaryBin {
+  lowerBound: number;
+  upperBound: number;
+  count: number;
+}
+
+export interface SalaryDistribution {
+  selectedCount: number;
+  usableCount: number;
+  bins: SalaryBin[];
+  tailCount: number;
+  tailMax: number | null;
+  regularPeak: number;
+  regularScaleMax: number;
+  allInTail: boolean;
+  supportedSummary: SupportedSalarySummary | null;
+  medianInRegularDomain: boolean;
+}
+
+function supportedSalarySummary(records: EditorialRecord[], metric: PayMetric): SupportedSalarySummary | null {
+  const summary = summarize(records, metric);
+  if (summary.n < MIN_COHORT) return null;
+  return {
+    median: summary.median!,
+    p25: summary.p25!,
+    p75: summary.p75!,
+  };
+}
+
+export function salaryDistribution(
+  records: EditorialRecord[],
+  metric: PayMetric = 'usdSalary',
+): SalaryDistribution {
+  const values = payValues(records, metric);
+  const bins = Array.from({ length: DISTRIBUTION_BIN_COUNT }, (_, index): SalaryBin => ({
+    lowerBound: index * DISTRIBUTION_BIN_WIDTH,
+    upperBound: (index + 1) * DISTRIBUTION_BIN_WIDTH,
+    count: 0,
+  }));
+  const tailValues: number[] = [];
+
+  for (const value of values) {
+    if (value >= DISTRIBUTION_LIMIT) {
+      tailValues.push(value);
+    } else {
+      bins[Math.floor(value / DISTRIBUTION_BIN_WIDTH)].count += 1;
+    }
+  }
+
+  const regularPeak = Math.max(0, ...bins.map(({ count }) => count));
+  const supportedSummary = supportedSalarySummary(records, metric);
+  return {
+    selectedCount: records.length,
+    usableCount: values.length,
+    bins,
+    tailCount: tailValues.length,
+    tailMax: tailValues.length ? Math.max(...tailValues) : null,
+    regularPeak,
+    regularScaleMax: Math.max(1, regularPeak),
+    allInTail: values.length > 0 && tailValues.length === values.length,
+    supportedSummary,
+    medianInRegularDomain: supportedSummary !== null && supportedSummary.median < DISTRIBUTION_LIMIT,
+  };
+}
+
+export type SalaryBreakdown = 'country' | 'role' | 'year';
+
+export interface GroupedSalaryRow {
+  key: string;
+  label: string;
+  selectedCount: number;
+  usableCount: number;
+  summary: SupportedSalarySummary | null;
+}
+
+export interface GroupedSalarySummary {
+  dimension: SalaryBreakdown;
+  groups: GroupedSalaryRow[];
+  isSingleGroup: boolean;
+}
+
+function breakdownKey(record: EditorialRecord, dimension: SalaryBreakdown): string {
+  const value = dimension === 'country'
+    ? record.country
+    : dimension === 'role'
+      ? record.roleType
+      : record.year > 0
+        ? String(record.year)
+        : '';
+  return String(value ?? '').trim() || 'Not stated';
+}
+
+function compareSummaryGroups(left: GroupedSalaryRow, right: GroupedSalaryRow): number {
+  if (left.summary && right.summary) {
+    return right.summary.median - left.summary.median ||
+      right.usableCount - left.usableCount ||
+      left.label.localeCompare(right.label);
+  }
+  if (left.summary) return -1;
+  if (right.summary) return 1;
+  return right.usableCount - left.usableCount ||
+    right.selectedCount - left.selectedCount ||
+    left.label.localeCompare(right.label);
+}
+
+export function groupSalarySummaries(
+  records: EditorialRecord[],
+  metric: PayMetric = 'usdSalary',
+  dimension: SalaryBreakdown = 'country',
+): GroupedSalarySummary {
+  const cohorts = new Map<string, EditorialRecord[]>();
+  for (const record of records) {
+    const key = breakdownKey(record, dimension);
+    const cohort = cohorts.get(key);
+    if (cohort) cohort.push(record);
+    else cohorts.set(key, [record]);
+  }
+
+  const groups = Array.from(cohorts, ([key, cohort]): GroupedSalaryRow => ({
+    key,
+    label: key,
+    selectedCount: cohort.length,
+    usableCount: payValues(cohort, metric).length,
+    summary: supportedSalarySummary(cohort, metric),
+  }));
+
+  if (dimension === 'year') {
+    groups.sort((left, right) => {
+      if (left.key === 'Not stated') return right.key === 'Not stated' ? 0 : 1;
+      if (right.key === 'Not stated') return -1;
+      return Number(left.key) - Number(right.key);
+    });
+  } else {
+    groups.sort(compareSummaryGroups);
+  }
+
+  return { dimension, groups, isSingleGroup: groups.length === 1 };
+}
+
 export function pairedRecords(records: EditorialRecord[]) {
   return records.filter((r) => validPay(r.usdSalary) && validPay(r.usdTotalComp) && r.usdTotalComp >= r.usdSalary);
 }
