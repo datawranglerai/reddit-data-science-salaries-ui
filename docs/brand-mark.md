@@ -2,7 +2,7 @@
 
 The current logo concept uses the supplied Tim Robinson / I Think You Should Leave still for the tilted head, raised brows, and knowing closed-mouth smile. The supplied Bao restaurant logo informs the graphic treatment: a solid dark hair silhouette, economical contours, open negative space, and an idiosyncratic hand-drawn character. The Bao character, eating gesture, and food are not used.
 
-Asset: [`public/brand/salary-smirk.png`](../public/brand/salary-smirk.png). Single dark ink on a transparent background. Used in the masthead, footer, and favicon. Vite's base URL keeps the image working under the GitHub Pages repository path. The visible wordmark supplies the accessible name; the adjacent illustration has an empty alt attribute.
+Asset: [`public/brand/salary-smirk.png`](../public/brand/salary-smirk.png). Single dark ink on a transparent background. Retained as the favicon; the current page no longer displays the portrait in its header or footer. Vite's base URL keeps the favicon working under the GitHub Pages repository path.
 
 Created with the built-in image-generation tool using the two user-supplied references. The original photos were not edited. The earlier Kevin James concept remains at `public/brand/salary-shrug.png` for comparison but is no longer rendered.
 

@@ -25,7 +25,11 @@ dist-ssr
 *.sln
 *.sw?
 .bolt/
+screenshots
 
 # Coding agents
 .omx
 .codex
+.claude
+
+
